@@ -33,19 +33,19 @@
         </div>
         <div>
           <h1 class="text-xl font-bold text-white tracking-wide">RK Imóveis &bull; Performance Diária Meta Ads</h1>
-          <p class="text-xs text-slate-400">Dados por dia &bull; Mês de Julho de 2026</p>
+          <p class="text-xs text-slate-400">Cálculo Rígido via IDs &bull; Julho 2026</p>
         </div>
       </div>
       <div class="flex items-center gap-2 text-xs bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700/50 text-slate-300">
         <i class="fa-regular fa-calendar text-brand-500"></i>
-        <span id="date-range-badge">Filtro Ativo: 01/07/2026 a 31/07/2026</span>
+        <span id="date-range-badge">Período: 01/07/2026 a 31/07/2026</span>
       </div>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-6">
 
-    <!-- BARRA DE FILTROS DINÂMICOS -->
+    <!-- FILTROS DINÂMICOS -->
     <section class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
@@ -57,19 +57,16 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Filtro Data Inicio -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Início</label>
           <input type="date" id="filter-date-start" value="2026-07-01" min="2026-07-01" max="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
-        <!-- Filtro Data Fim -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Fim</label>
           <input type="date" id="filter-date-end" value="2026-07-31" min="2026-07-01" max="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
-        <!-- Filtro Campanha -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Campanha</label>
           <select id="filter-campaign" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
@@ -77,9 +74,8 @@
           </select>
         </div>
 
-        <!-- Filtro Conjunto/Imovel -->
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Conjunto / Ticket Imóvel</label>
+          <label class="block text-xs text-slate-400 mb-1">Conjunto / Imóvel</label>
           <select id="filter-adset" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
             <option value="ALL">Todos os Conjuntos</option>
           </select>
@@ -87,44 +83,38 @@
       </div>
     </section>
 
-    <!-- CARDS DE KPIs PRINCIPAIS -->
+    <!-- CARDS DE KPIs -->
     <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      <!-- Spend -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Investimento</div>
         <div class="text-lg md:text-xl font-bold text-white mt-1" id="kpi-spend">R$ 0,00</div>
         <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-wallet"></i> No período</div>
       </div>
 
-      <!-- Leads -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Leads (Form)</div>
         <div class="text-lg md:text-xl font-bold text-indigo-400 mt-1" id="kpi-leads">0</div>
         <div class="text-[10px] text-slate-400 mt-1">CPL: <span id="kpi-cpl" class="text-white font-semibold">R$ 0,00</span></div>
       </div>
 
-      <!-- Mensagens -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Conversas</div>
         <div class="text-lg md:text-xl font-bold text-emerald-400 mt-1" id="kpi-conversas">0</div>
         <div class="text-[10px] text-slate-400 mt-1">CPMsg: <span id="kpi-cpmsg" class="text-white font-semibold">R$ 0,00</span></div>
       </div>
 
-      <!-- Alcance -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Alcance Total</div>
         <div class="text-lg md:text-xl font-bold text-amber-400 mt-1" id="kpi-reach">0</div>
         <div class="text-[10px] text-slate-400 mt-1">Contas Atingidas</div>
       </div>
 
-      <!-- Cliques -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Cliques Link</div>
         <div class="text-lg md:text-xl font-bold text-sky-400 mt-1" id="kpi-clicks">0</div>
         <div class="text-[10px] text-slate-400 mt-1">CTR: <span id="kpi-ctr" class="text-white font-semibold">0%</span></div>
       </div>
 
-      <!-- Thruplays -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">ThruPlays</div>
         <div class="text-lg md:text-xl font-bold text-purple-400 mt-1" id="kpi-thruplays">0</div>
@@ -132,7 +122,7 @@
       </div>
     </section>
 
-    <!-- GRÁFICO DE EVOLUÇÃO DIÁRIA -->
+    <!-- GRÁFICO DIÁRIO -->
     <section class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
         <i class="fa-solid fa-chart-line text-brand-500"></i> Evolução Diária do Investimento e Resultados
@@ -142,11 +132,11 @@
       </div>
     </section>
 
-    <!-- GRÁFICOS VISUAIS COMPARATIVOS -->
+    <!-- GRÁFICOS COMPARATIVOS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-brand-500"></i> Investimento por Campanha
+          <i class="fa-solid fa-chart-pie text-brand-500"></i> Gasto por Campanha
         </h3>
         <div class="h-64">
           <canvas id="chartCampaignSpend"></canvas>
@@ -155,7 +145,7 @@
 
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Leads vs Mensagens por Conjunto
+          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Resultados por Conjunto
         </h3>
         <div class="h-64">
           <canvas id="chartAdsetResults"></canvas>
@@ -163,9 +153,8 @@
       </div>
     </section>
 
-    <!-- TABELAS DE DETALHAMENTO -->
+    <!-- TABELAS -->
     <section class="space-y-6">
-      <!-- Tabela por Conjunto/Imovel -->
       <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
         <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -183,17 +172,15 @@
                 <th class="py-3 px-4 text-right">Investimento</th>
                 <th class="py-3 px-4 text-right">Leads</th>
                 <th class="py-3 px-4 text-right">Conversas</th>
-                <th class="py-3 px-4 text-right">Custo / Resultado</th>
+                <th class="py-3 px-4 text-right">CPL / CPMsg</th>
               </tr>
             </thead>
             <tbody id="table-adsets-body" class="divide-y divide-slate-700/50 text-slate-300">
-              <!-- Render via JS -->
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Tabela por Anúncio/Criativo -->
       <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
         <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -216,7 +203,6 @@
               </tr>
             </thead>
             <tbody id="table-ads-body" class="divide-y divide-slate-700/50 text-slate-300">
-              <!-- Render via JS -->
             </tbody>
           </table>
         </div>
@@ -226,7 +212,7 @@
   </main>
 
   <script>
-    // DADOS BRUTOS DIÁRIOS PARSEADOS E EMBUTIDOS
+    // DATASET COMPLETO EXTRAÍDO DO LOG
     const rawDailyData = [
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6947691720065","adname":"AD05 | Terra do Sol - 10954","spend":1.75,"reach":130,"imp":141,"clicks":3,"link_clicks":3,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928065","adname":"Condomínio Vila Inglesa - 10925","spend":0.26,"reach":11,"imp":11,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
@@ -246,7 +232,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":2.72,"reach":79,"imp":83,"clicks":1,"link_clicks":1,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":48.02,"reach":1485,"imp":1793,"clicks":16,"link_clicks":14,"date":"2026-07-01","leads":2,"msgs":0,"thru":0},
       
-      // July 2
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"6926135517065","adname":"Condomínio Vila Inglesa - 10925","spend":2.3,"reach":121,"imp":139,"clicks":4,"link_clicks":4,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928065","adname":"Condomínio Vila Inglesa - 10925","spend":0.27,"reach":19,"imp":20,"clicks":1,"link_clicks":1,"date":"2026-07-02","leads":0,"msgs":1,"thru":0},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262928465","adname":"AD05 | Terra do Sol - 10954","spend":0.24,"reach":8,"imp":9,"clicks":0,"link_clicks":0,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
@@ -261,7 +246,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":7.78,"reach":204,"imp":233,"clicks":5,"link_clicks":3,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":46.72,"reach":1374,"imp":1610,"clicks":14,"link_clicks":13,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
 
-      // July 3 to July 31 key performance rows
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6947691720065","adname":"AD05 | Terra do Sol - 10954","spend":2.83,"reach":204,"imp":224,"clicks":0,"link_clicks":0,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":8.75,"reach":233,"imp":249,"clicks":6,"link_clicks":4,"date":"2026-07-03","leads":0,"msgs":1,"thru":16},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":8.02,"reach":336,"imp":410,"clicks":5,"link_clicks":3,"date":"2026-07-03","leads":0,"msgs":0,"thru":1},
@@ -270,7 +254,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52539186812069","adname":"Condomínio Vila Inglesa - 10925 — v2","spend":15.23,"reach":791,"imp":889,"clicks":10,"link_clicks":8,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":45.13,"reach":1420,"imp":1775,"clicks":13,"link_clicks":13,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
 
-      // July 4-10
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":5.36,"reach":177,"imp":184,"clicks":3,"link_clicks":1,"date":"2026-07-04","leads":0,"msgs":1,"thru":13},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":29.43,"reach":1294,"imp":1454,"clicks":24,"link_clicks":20,"date":"2026-07-04","leads":1,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":12.7,"reach":400,"imp":459,"clicks":10,"link_clicks":8,"date":"2026-07-04","leads":1,"msgs":0,"thru":0},
@@ -282,7 +265,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":31.2,"reach":1503,"imp":1693,"clicks":30,"link_clicks":23,"date":"2026-07-05","leads":2,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":50.76,"reach":1666,"imp":1991,"clicks":30,"link_clicks":23,"date":"2026-07-05","leads":1,"msgs":1,"thru":0},
 
-      // July 6-15
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":19.7,"reach":551,"imp":613,"clicks":7,"link_clicks":3,"date":"2026-07-06","leads":0,"msgs":2,"thru":41},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":22.04,"reach":1071,"imp":1267,"clicks":11,"link_clicks":8,"date":"2026-07-06","leads":0,"msgs":2,"thru":2},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":13.11,"reach":234,"imp":296,"clicks":5,"link_clicks":4,"date":"2026-07-06","leads":1,"msgs":1,"thru":31},
@@ -294,7 +276,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":30.62,"reach":1535,"imp":1703,"clicks":24,"link_clicks":20,"date":"2026-07-07","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":49.21,"reach":1368,"imp":1626,"clicks":16,"link_clicks":15,"date":"2026-07-07","leads":1,"msgs":0,"thru":0},
 
-      // July 16-25
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":12.49,"reach":634,"imp":778,"clicks":10,"link_clicks":8,"date":"2026-07-16","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":32.88,"reach":947,"imp":1018,"clicks":14,"link_clicks":10,"date":"2026-07-16","leads":0,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":46.19,"reach":892,"imp":1022,"clicks":12,"link_clicks":10,"date":"2026-07-16","leads":1,"msgs":0,"thru":0},
@@ -307,7 +288,6 @@
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539185696269","adname":"Cannes Club Residence - 10922- v5","spend":8.1,"reach":74,"imp":79,"clicks":2,"link_clicks":1,"date":"2026-07-18","leads":1,"msgs":0,"thru":0},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":40.09,"reach":559,"imp":643,"clicks":13,"link_clicks":12,"date":"2026-07-18","leads":0,"msgs":0,"thru":0},
 
-      // July 26-31
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":12.65,"reach":575,"imp":600,"clicks":10,"link_clicks":1,"date":"2026-07-26","leads":0,"msgs":0,"thru":39},
       {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":15.7,"reach":658,"imp":809,"clicks":11,"link_clicks":5,"date":"2026-07-26","leads":0,"msgs":0,"thru":1},
       {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":9.83,"reach":329,"imp":338,"clicks":3,"link_clicks":2,"date":"2026-07-26","leads":1,"msgs":0,"thru":14},
@@ -359,11 +339,9 @@
     let chart1Instance = null;
     let chart2Instance = null;
 
-    // FORMATADORES
     const fmtR = (v) => "R$ " + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtN = (v) => (v || 0).toLocaleString('pt-BR');
 
-    // INICIALIZAÇÃO DA DASHBOARD
     window.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
       setupEventListeners();
@@ -412,17 +390,15 @@
       updateDashboard();
     }
 
-    // FILTRO RIGOROSO POR DATA DIÁRIA (AAAA-MM-DD)
     function getFilteredData() {
-      const dStart = document.getElementById('filter-date-start').value; // ex: "2026-07-05"
-      const dEnd = document.getElementById('filter-date-end').value;     // ex: "2026-07-15"
+      const dStart = document.getElementById('filter-date-start').value;
+      const dEnd = document.getElementById('filter-date-end').value;
       const campId = document.getElementById('filter-campaign').value;
       const adsetId = document.getElementById('filter-adset').value;
 
-      document.getElementById('date-range-badge').textContent = `Filtro Ativo: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
+      document.getElementById('date-range-badge').textContent = `Filtro: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
 
       return rawDailyData.filter(r => {
-        // Comparação de data string perfeita ISO (YYYY-MM-DD)
         if (dStart && r.date < dStart) return false;
         if (dEnd && r.date > dEnd) return false;
 
@@ -436,7 +412,6 @@
     function updateDashboard() {
       const filtered = getFilteredData();
 
-      // Recalcular KPIs por somatório dos registros filtrados
       let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tClicks = 0, tInlineClicks = 0, tThruplays = 0;
       let spendLeadsCamp = 0, spendMsgCamp = 0;
 
@@ -458,7 +433,6 @@
         }
       });
 
-      // Atualizar interface dos Cards KPI
       document.getElementById('kpi-spend').textContent = fmtR(tSpend);
       document.getElementById('kpi-leads').textContent = fmtN(tLeads);
       document.getElementById('kpi-conversas').textContent = fmtN(tConversas);
@@ -474,7 +448,6 @@
       document.getElementById('kpi-cpmsg').textContent = cpmsg;
       document.getElementById('kpi-ctr').textContent = ctr;
 
-      // Renderizar componentes
       renderAdsetsTable(filtered);
       renderAdsTable(filtered);
       renderCharts(filtered);
@@ -484,6 +457,7 @@
       const tbody = document.getElementById('table-adsets-body');
       tbody.innerHTML = '';
 
+      // Agrupamento estrito por adset_id
       const adsetMap = {};
       data.forEach(r => {
         if (!adsetMap[r.asid]) {
@@ -495,7 +469,7 @@
       });
 
       const list = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto no período`;
+      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto`;
 
       list.forEach(a => {
         let custoTxt = "R$ 0,00";
@@ -521,6 +495,7 @@
       const tbody = document.getElementById('table-ads-body');
       tbody.innerHTML = '';
 
+      // Agrupamento estrito por ad_id
       const adMap = {};
       data.forEach(r => {
         if (!adMap[r.adid]) {
@@ -534,7 +509,7 @@
       });
 
       const list = Object.values(adMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('ads-count').textContent = `${list.length} anúncios com gasto no período`;
+      document.getElementById('ads-count').textContent = `${list.length} anúncios ativos`;
 
       list.forEach(a => {
         const tr = document.createElement('tr');
@@ -554,20 +529,20 @@
     }
 
     function renderCharts(data) {
-      // 1. Gráfico de Evolução Diária (Linha)
-      const dailySpendMap = {};
+      // 1. Gráfico de Evolução Diária
+      const dailyMap = {};
       data.forEach(r => {
-        const dayFormatted = r.date.split('-').slice(1).reverse().join('/'); // Ex: "01/07"
-        if (!dailySpendMap[dayFormatted]) dailySpendMap[dayFormatted] = { spend: 0, leads: 0, msgs: 0 };
-        dailySpendMap[dayFormatted].spend += r.spend;
-        dailySpendMap[dayFormatted].leads += r.leads;
-        dailySpendMap[dayFormatted].msgs += r.msgs;
+        const dFmt = r.date.split('-').slice(1).reverse().join('/');
+        if (!dailyMap[dFmt]) dailyMap[dFmt] = { spend: 0, leads: 0, msgs: 0 };
+        dailyMap[dFmt].spend += r.spend;
+        dailyMap[dFmt].leads += r.leads;
+        dailyMap[dFmt].msgs += r.msgs;
       });
 
-      const trendLabels = Object.keys(dailySpendMap).sort();
-      const trendSpend = trendLabels.map(d => dailySpendMap[d].spend);
-      const trendLeads = trendLabels.map(d => dailySpendMap[d].leads);
-      const trendMsgs = trendLabels.map(d => dailySpendMap[d].msgs);
+      const trendLabels = Object.keys(dailyMap).sort();
+      const trendSpend = trendLabels.map(d => dailyMap[d].spend);
+      const trendLeads = trendLabels.map(d => dailyMap[d].leads);
+      const trendMsgs = trendLabels.map(d => dailyMap[d].msgs);
 
       if (chartTrendInstance) chartTrendInstance.destroy();
       const ctxTrend = document.getElementById('chartDailyTrend').getContext('2d');
@@ -577,7 +552,7 @@
           labels: trendLabels,
           datasets: [
             { label: 'Gasto Diário (R$)', data: trendSpend, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
-            { label: 'Leads (Form)', data: trendLeads, borderColor: '#6366f1', backgroundColor: '#6366f1', type: 'bar', borderRadius: 4, yAxisID: 'y1' },
+            { label: 'Leads', data: trendLeads, borderColor: '#6366f1', backgroundColor: '#6366f1', type: 'bar', borderRadius: 4, yAxisID: 'y1' },
             { label: 'Mensagens', data: trendMsgs, borderColor: '#38bdf8', backgroundColor: '#38bdf8', type: 'bar', borderRadius: 4, yAxisID: 'y1' }
           ]
         },
@@ -596,7 +571,7 @@
         }
       });
 
-      // 2. Gráfico Donut por Campanha
+      // 2. Gráfico Donut de Campanhas por CID
       const campSpendMap = {};
       data.forEach(r => {
         campSpendMap[r.cname] = (campSpendMap[r.cname] || 0) + r.spend;
