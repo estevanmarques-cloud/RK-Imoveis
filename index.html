@@ -1,668 +1,944 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Meta Ads Dinâmico Multi-Cliente</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Ads BI - Advanced Local Engine</title>
+    
+    <!-- Dependências Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- HEADER / NAVBAR -->
-  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-50 px-6 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="bg-brand-600 p-2.5 rounded-xl shadow-lg shadow-brand-500/30">
-          <i class="fa-solid fa-chart-line text-xl text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl font-bold text-white tracking-wide" id="client-title-display">Meta Ads Dashboard</h1>
-            <span id="badge-client-type" class="hidden text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300"></span>
-          </div>
-          <p class="text-xs text-slate-400" id="status-txt">Selecione o arquivo Dados.txt para carregar os dados</p>
-        </div>
-      </div>
-      
-      <!-- BOTÃO UPLOAD DADOS.TXT -->
-      <div class="flex items-center gap-3">
-        <label class="cursor-pointer bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
-          <i class="fa-solid fa-file-arrow-up text-sm"></i>
-          <span>Carregar Dados.txt</span>
-          <input type="file" id="file-input" accept=".txt,.json" class="hidden">
-        </label>
-        <div class="text-xs bg-slate-900/60 px-3 py-2.5 rounded-xl border border-slate-700/50 text-slate-300">
-          <span id="date-range-badge">Aguardando arquivo...</span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-6">
-
-    <!-- SEÇÃO DE FILTROS INTERATIVOS -->
-    <section class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-filter text-brand-500"></i> Filtros de Pesquisa
-        </h2>
-        <button onclick="resetFilters()" class="text-xs text-brand-500 hover:text-brand-100 transition flex items-center gap-1">
-          <i class="fa-solid fa-rotate-right"></i> Resetar Filtros
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Data Início</label>
-          <input type="date" id="filter-date-start" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
-        </div>
-
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Data Fim</label>
-          <input type="date" id="filter-date-end" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
-        </div>
-
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Campanha</label>
-          <select id="filter-campaign" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
-            <option value="ALL">Todas as Campanhas</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Conjunto / Oferta</label>
-          <select id="filter-adset" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
-            <option value="ALL">Todos os Conjuntos</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- CARDS DE KPIS DINÂMICOS -->
-    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" id="kpi-container">
-      <!-- Injetado via JS -->
-    </section>
-
-    <!-- EVOLUÇÃO DIÁRIA -->
-    <section class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-chart-line text-brand-500"></i> Evolução Diária de Desempenho
-      </h3>
-      <div class="h-64">
-        <canvas id="chartDailyTrend"></canvas>
-      </div>
-    </section>
-
-    <!-- GRÁFICOS VISUAIS DE DIVISÃO E RESULTADOS -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-brand-500"></i> Divisão de Gasto por Campanha
-        </h3>
-        <div class="h-64">
-          <canvas id="chartCampaignSpend"></canvas>
-        </div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Resultados por Conjunto
-        </h3>
-        <div class="h-64">
-          <canvas id="chartAdsetResults"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- TABELA ADAPTATIVA DE DETALHAMENTO -->
-    <section class="space-y-6" id="dynamic-tables-container">
-      <!-- Injetado via JS -->
-    </section>
-
-  </main>
-
-  <script>
-    let rawData = [];
-    let clientMetadata = { name: "Cliente Meta Ads", rank: "", sec: "", isRK: false };
-
-    let chartTrendInstance = null;
-    let chart1Instance = null;
-    let chart2Instance = null;
-
-    const fmtR = (v) => "R$ " + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const fmtN = (v) => (v || 0).toLocaleString('pt-BR');
-
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('file-input').addEventListener('change', handleFileSelect);
-      setupEventListeners();
-    });
-
-    // ============================================================================
-    // 1. LEITOR DE ARQUIVO E PARSER DE LINHAS (PRECISÃO MATEMÁTICA)
-    // ============================================================================
-    function handleFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const text = evt.target.result;
-        parseHeaderMetadata(text);
-        rawData = parseDailyData(text);
-        
-        document.getElementById('status-txt').textContent = `Cliente: ${clientMetadata.name} | ${rawData.length} registros processados por ID`;
-        document.getElementById('client-title-display').textContent = clientMetadata.name;
-        
-        const badge = document.getElementById('badge-client-type');
-        badge.classList.remove('hidden');
-        if(clientMetadata.isRK) {
-          badge.textContent = "Template RK Imóveis";
-          badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-        } else {
-          badge.textContent = "Template Padrão / E-commerce";
-          badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30";
-        }
-
-        populateDropdowns();
-        updateDashboard();
-      };
-      reader.readAsText(file);
-    }
-
-    function parseHeaderMetadata(text) {
-      const mClient = text.match(/(?:Cliente|cliente)\r?\n([^\r\n]+)/);
-      const mRank = text.match(/Metrica Rank Anuncio\r?\n([^\r\n]+)/);
-      const mSec = text.match(/Metricas Secundarias\r?\n([^\r\n]+)/);
-
-      const clientName = mClient ? mClient[1].trim() : "Cliente Meta Ads";
-      const metricaRank = mRank ? mRank[1].trim().toLowerCase() : "";
-      const metricasSec = mSec ? mSec[1].trim().toLowerCase() : "";
-
-      clientMetadata = {
-        name: clientName,
-        rank: metricaRank,
-        sec: metricasSec,
-        isRK: clientName.toUpperCase().includes("RK")
-      };
-    }
-
-    function parseDailyData(text) {
-      const items = [];
-      const blocks = text.split(/\n(?=(?:\d+\r?\n)?campaign_id:)/);
-
-      blocks.forEach(b => {
-        if (!b.includes('campaign_id:')) return;
-
-        const lines = b.split('\n').map(l => l.trim());
-
-        const getVal = (key) => {
-          for (let l of lines) {
-            if (l.startsWith(key + ':')) {
-              return l.substring(key.length + 1).trim();
+    <!-- Configuração do Tailwind (Linear / Vercel Vibe) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0fdfa', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' },
+                        surface: { 100: '#ffffff', 800: '#18181b', 900: '#09090b' },
+                        border: { light: '#e4e4e7', dark: '#27272a' }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(20, 184, 166, 0.1)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }
+                }
             }
-          }
-          return '';
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #f4f4f5; }
+        .glass-panel { background: rgba(24, 24, 27, 0.65); backdrop-filter: blur(12px); border: 1px solid #27272a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Sidebar Layout Placeholder (Será preenchido pelo Renderer) -->
+    <aside id="sidebar-container" class="w-full md:w-64 glass-panel border-r border-border-dark flex-shrink-0 flex flex-col"></aside>
+    
+    <!-- Main Content Layout -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header id="topbar-container" class="h-16 glass-panel border-b border-border-dark flex items-center justify-between px-6 shrink-0">
+            <!-- Será preenchido dinamicamente -->
+        </header>
+        <div id="workspace-container" class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+            <!-- File Input Area Inicial -->
+            <div id="drop-zone" class="w-full max-w-2xl mx-auto mt-20 p-12 border-2 border-dashed border-border-dark rounded-xl flex flex-col items-center justify-center text-center transition-colors hover:border-brand-500 hover:bg-brand-900/10 cursor-pointer">
+                <i data-lucide="upload-cloud" class="w-12 h-12 text-brand-500 mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Carregar Dados (JSON, TXT, n8n logs)</h3>
+                <p class="text-gray-400 text-sm mb-6">Todo processamento acontece localmente no seu navegador.</p>
+                <input type="file" id="file-upload" class="hidden" accept=".json,.txt,.csv" multiple>
+                <button onclick="document.getElementById('file-upload').click()" class="bg-brand-600 hover:bg-brand-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                    Selecionar Arquivos
+                </button>
+            </div>
+            
+            <!-- Dashboard Content (Oculto inicialmente) -->
+            <div id="dashboard-content" class="hidden flex-col gap-6"></div>
+        </div>
+    </main>
+
+    <!-- Core Modules Script -->
+    <script>
+        /**
+         * ==========================================
+         * MÓDULO 1: UTILS
+         * ==========================================
+         */
+        const Utils = {
+            safeDiv: (num, den) => (den === 0 || isNaN(den) || !den) ? 0 : num / den,
+            
+            formatCurrency: (value, currency = 'BRL') => {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(value || 0);
+            },
+            
+            formatNumber: (value) => {
+                return new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value || 0);
+            },
+            
+            formatPercent: (value) => {
+                return new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 2 }).format(value || 0);
+            },
+            
+            debounce: (func, wait) => {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => { clearTimeout(timeout); func(...args); };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            
+            generateId: () => crypto.randomUUID(),
+
+            extractNestedValue: (arr, targetKey, valueKey = 'value') => {
+                if (!Array.isArray(arr)) return 0;
+                const found = arr.find(item => item.action_type === targetKey || item.name === targetKey);
+                return found ? parseFloat(found[valueKey] || 0) : 0;
+            }
         };
 
-        const cid = getVal('campaign_id');
-        const cname = getVal('campaign_name');
-        const asid = getVal('adset_id');
-        const asname = getVal('adset_name');
-        const adid = getVal('ad_id');
-        const adname = getVal('ad_name');
-        const spend = parseFloat(getVal('spend') || '0');
-        const reach = parseInt(getVal('reach') || '0');
-        const imp = parseInt(getVal('impressions') || '0');
-        const clicks = parseInt(getVal('clicks') || '0');
-        const link_clicks = parseInt(getVal('inline_link_clicks') || '0');
-        const date = getVal('date_start');
-
-        // LEADS (Apenas 1 por bloco diário para evitar duplicidade de lead_grouped)
-        let leads = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i] === 'action_type:lead' || lines[i] === 'action_type:onsite_conversion.lead_grouped') {
-            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
-              leads = parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
-              break; 
+        /**
+         * ==========================================
+         * MÓDULO 2: CONFIG
+         * ==========================================
+         */
+        const Config = {
+            chartDefaults: {
+                responsive: true,
+                maintainAspectRatio: false,
+                color: '#a1a1aa',
+                font: { family: 'Inter', size: 12 },
+                plugins: {
+                    legend: { labels: { color: '#e4e4e7' } },
+                    tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', titleColor: '#fff', bodyColor: '#cbd5e1', borderColor: '#27272a', borderWidth: 1 }
+                },
+                scales: {
+                    x: { grid: { color: '#27272a', drawBorder: false }, ticks: { color: '#a1a1aa' } },
+                    y: { grid: { color: '#27272a', drawBorder: false }, ticks: { color: '#a1a1aa' } }
+                }
             }
-          }
-        }
+        };
 
-        // MENSAGENS (Captura estrita do evento exato na linha seguinte)
-        let msgs = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i] === 'action_type:onsite_conversion.messaging_conversation_started_7d') {
-            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
-              msgs += parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
+        Chart.defaults.color = Config.chartDefaults.color;
+        Chart.defaults.font.family = Config.chartDefaults.font.family;
+
+        /**
+         * ==========================================
+         * MÓDULO 3: APPSTATE
+         * ==========================================
+         */
+        class StateManager {
+            constructor() {
+                this.state = {
+                    rawData: [],
+                    normalized: [],
+                    filtered: [],
+                    campaigns: new Map(),
+                    adsets: new Map(),
+                    ads: new Map(),
+                    metrics: { global: {} },
+                    charts: {},
+                    filters: { dateStart: null, dateEnd: null, campaigns: [], search: '' },
+                    settings: { theme: 'dark', businessType: 'unknown' },
+                    insights: [],
+                    selected: null
+                };
+                this.listeners = new Set();
             }
-          }
-        }
 
-        // E-COMMERCE (Compras e Faturamento)
-        let compras = 0;
-        let faturamento = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i] === 'action_type:purchase') {
-            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
-              compras += parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
+            subscribe(listener) {
+                this.listeners.add(listener);
+                return () => this.listeners.delete(listener);
             }
-          }
-        }
 
-        // THRUPLAYS
-        let thru = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].includes('video_thruplay_watched_actions')) {
-            for (let j = i; j < Math.min(i + 5, lines.length); j++) {
-              if (lines[j].startsWith('value:')) {
-                thru = parseInt(lines[j].replace('value:', '').trim()) || 0;
-                break;
-              }
+            notify(changedKeys = []) {
+                this.listeners.forEach(listener => listener(this.state, changedKeys));
             }
-          }
+
+            get(key) {
+                return this.state[key];
+            }
+
+            set(key, value) {
+                this.state[key] = value;
+                this.notify([key]);
+            }
+
+            update(updates) {
+                const keys = Object.keys(updates);
+                keys.forEach(key => {
+                    this.state[key] = updates[key];
+                });
+                this.notify(keys);
+            }
         }
 
-        if (cid && date) {
-          items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, compras, faturamento, thru });
-        }
-      });
+        const AppState = new StateManager();
+        lucide.createIcons();
 
-      return items;
-    }
+        /**
+         * ==========================================
+         * MÓDULO 4: PARSER
+         * ==========================================
+         */
+        const Parser = {
+            async processFiles(files) {
+                const allData = [];
+                for (const file of files) {
+                    try {
+                        const text = await this.readFile(file);
+                        const parsed = this.parseText(text);
+                        
+                        if (Array.isArray(parsed)) {
+                            allData.push(...parsed);
+                        } else if (typeof parsed === 'object' && parsed !== null) {
+                            if (parsed.data && Array.isArray(parsed.data)) {
+                                allData.push(...parsed.data);
+                            } else {
+                                allData.push(parsed);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`[Parser] Falha contornada no arquivo ${file.name}:`, error);
+                    }
+                }
+                return allData;
+            },
 
-    function populateDropdowns() {
-      const campSelect = document.getElementById('filter-campaign');
-      const adsetSelect = document.getElementById('filter-adset');
+            readFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsText(file);
+                });
+            },
 
-      campSelect.innerHTML = '<option value="ALL">Todas as Campanhas</option>';
-      adsetSelect.innerHTML = '<option value="ALL">Todos os Conjuntos</option>';
+            parseText(text) {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    const lines = text.split('\n');
+                    const validData = [];
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const jsonStart = line.indexOf('{');
+                            const jsonStartArr = line.indexOf('[');
+                            let startIdx = -1;
+                            
+                            if (jsonStart !== -1 && jsonStartArr !== -1) startIdx = Math.min(jsonStart, jsonStartArr);
+                            else if (jsonStart !== -1) startIdx = jsonStart;
+                            else if (jsonStartArr !== -1) startIdx = jsonStartArr;
+                            
+                            if (startIdx > -1) {
+                                validData.push(JSON.parse(line.substring(startIdx)));
+                            }
+                        } catch (err) {}
+                    }
+                    return validData;
+                }
+            }
+        };
 
-      const camps = {}, adsets = {}, dates = [];
+        /**
+         * ==========================================
+         * MÓDULO 5: NORMALIZER
+         * ==========================================
+         */
+        const Normalizer = {
+            normalize(rawData) {
+                return rawData.map(row => {
+                    const parsedActions = this.parseDynamicArray(row.actions || []);
+                    const parsedActionValues = this.parseDynamicArray(row.action_values || []);
 
-      rawData.forEach(r => {
-        camps[r.cid] = r.cname;
-        adsets[r.asid] = `${r.asname} (${r.cname})`;
-        if(!dates.includes(r.date)) dates.push(r.date);
-      });
+                    return {
+                        _id: Utils.generateId(),
+                        campaign_id: row.campaign_id || 'unknown_campaign',
+                        campaign_name: row.campaign_name || 'Campanha Desconhecida',
+                        adset_id: row.adset_id || 'unknown_adset',
+                        adset_name: row.adset_name || 'Conjunto Desconhecido',
+                        ad_id: row.ad_id || 'unknown_ad',
+                        ad_name: row.ad_name || 'Criativo Desconhecido',
+                        spend: parseFloat(row.spend || 0),
+                        reach: parseInt(row.reach || 0),
+                        impressions: parseInt(row.impressions || 0),
+                        clicks: parseInt(row.clicks || 0),
+                        inline_link_clicks: parseInt(row.inline_link_clicks || 0),
+                        actions: parsedActions,
+                        action_values: parsedActionValues,
+                        date_start: row.date_start || null,
+                        date_stop: row.date_stop || null,
+                        optimization_goal: row.optimization_goal || 'UNKNOWN'
+                    };
+                });
+            },
 
-      dates.sort();
-      if(dates.length > 0) {
-        document.getElementById('filter-date-start').value = dates[0];
-        document.getElementById('filter-date-end').value = dates[dates.length - 1];
-        document.getElementById('filter-date-start').min = dates[0];
-        document.getElementById('filter-date-end').max = dates[dates.length - 1];
-      }
+            parseDynamicArray(arr) {
+                const map = {};
+                if (!Array.isArray(arr)) return map;
+                
+                arr.forEach(item => {
+                    if (item.action_type) {
+                        const safeKey = item.action_type.replace(/\./g, '_');
+                        map[safeKey] = parseFloat(item.value || 0);
+                    }
+                });
+                return map;
+            }
+        };
 
-      Object.keys(camps).forEach(cid => {
-        const opt = document.createElement('option');
-        opt.value = cid; opt.textContent = camps[cid];
-        campSelect.appendChild(opt);
-      });
+        /**
+         * ==========================================
+         * MÓDULO 6: BUSINESS DETECTOR
+         * ==========================================
+         */
+        const BusinessDetector = {
+            detect(normalizedData) {
+                let metricsCount = { purchase: 0, lead: 0, message: 0 };
+                let maxLeadValue = 0;
+                
+                normalizedData.forEach(row => {
+                    const purchases = (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
+                    const leads = (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
+                    const messages = (row.actions.messaging_conversation_started_7d || 0) + (row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
+                    
+                    if (purchases > 0) metricsCount.purchase += purchases;
+                    if (leads > 0) metricsCount.lead += leads;
+                    if (messages > 0) metricsCount.message += messages;
+                    
+                    const currentLeadValue = row.action_values.lead || 0;
+                    if (currentLeadValue > maxLeadValue) maxLeadValue = currentLeadValue;
+                });
 
-      Object.keys(adsets).forEach(aid => {
-        const opt = document.createElement('option');
-        opt.value = aid; opt.textContent = adsets[aid];
-        adsetSelect.appendChild(opt);
-      });
-    }
+                if (metricsCount.purchase > metricsCount.lead && metricsCount.purchase > metricsCount.message) return 'ecommerce';
+                if (metricsCount.lead > metricsCount.purchase) {
+                    if (maxLeadValue > 50000) return 'real_estate';
+                    return 'lead_generation';
+                }
+                if (metricsCount.message > metricsCount.purchase && metricsCount.message > metricsCount.lead) return 'messaging';
 
-    function setupEventListeners() {
-      document.getElementById('filter-date-start').addEventListener('change', updateDashboard);
-      document.getElementById('filter-date-end').addEventListener('change', updateDashboard);
-      document.getElementById('filter-campaign').addEventListener('change', updateDashboard);
-      document.getElementById('filter-adset').addEventListener('change', updateDashboard);
-    }
+                return 'brand_awareness';
+            }
+        };
 
-    function resetFilters() {
-      populateDropdowns();
-      updateDashboard();
-    }
+        /**
+         * ==========================================
+         * INPUT HOOK
+         * ==========================================
+         */
+        document.getElementById('file-upload').addEventListener('change', async (event) => {
+            const files = event.target.files;
+            if (files.length === 0) return;
 
-    function getFilteredData() {
-      const dStart = document.getElementById('filter-date-start').value;
-      const dEnd = document.getElementById('filter-date-end').value;
-      const campId = document.getElementById('filter-campaign').value;
-      const adsetId = document.getElementById('filter-adset').value;
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerHTML = `
+                <i data-lucide="loader-2" class="w-12 h-12 text-brand-500 mb-4 animate-spin"></i>
+                <h3 class="text-xl font-semibold mb-2">Processando arquivo(s)...</h3>
+            `;
+            lucide.createIcons();
 
-      if(dStart && dEnd) {
-        document.getElementById('date-range-badge').textContent = `Filtro: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
-      }
-
-      return rawData.filter(r => {
-        if (dStart && r.date < dStart) return false;
-        if (dEnd && r.date > dEnd) return false;
-        if (campId !== 'ALL' && r.cid !== campId) return false;
-        if (adsetId !== 'ALL' && r.asid !== adsetId) return false;
-        return true;
-      });
-    }
-
-    // ============================================================================
-    // 2. RECALCULO E RENDERIZAÇÃO REATIVA
-    // ============================================================================
-    function updateDashboard() {
-      const filtered = getFilteredData();
-
-      let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tInlineClicks = 0, tThruplays = 0, tCompras = 0, tFaturamento = 0;
-      let spendLeadsCamp = 0, spendMsgCamp = 0;
-
-      filtered.forEach(r => {
-        tSpend += r.spend;
-        tLeads += r.leads;
-        tConversas += r.msgs;
-        tReach += r.reach;
-        tImpressions += r.imp;
-        tInlineClicks += r.link_clicks;
-        tThruplays += r.thru;
-        tCompras += r.compras;
-        tFaturamento += r.faturamento;
-
-        if (r.cname.toLowerCase().includes('form') || r.cname.toLowerCase().includes('lead')) spendLeadsCamp += r.spend;
-        if (r.cname.toLowerCase().includes('mensag') || r.cname.toLowerCase().includes('whatsapp')) spendMsgCamp += r.spend;
-      });
-
-      renderKPIs({ tSpend, tLeads, tConversas, tReach, tImpressions, tInlineClicks, tThruplays, tCompras, tFaturamento, spendLeadsCamp, spendMsgCamp });
-      renderDynamicTables(filtered);
-      renderCharts(filtered);
-    }
-
-    function renderKPIs(k) {
-      const container = document.getElementById('kpi-container');
-      const isEcommerce = clientMetadata.rank.includes("compras") || clientMetadata.rank.includes("vendas") || k.tCompras > 0;
-
-      const cpl = k.tLeads > 0 ? fmtR(k.spendLeadsCamp / k.tLeads) : "R$ 0,00";
-      const cpmsg = k.tConversas > 0 ? fmtR((k.spendMsgCamp > 0 ? k.spendMsgCamp : k.tSpend) / k.tConversas) : "R$ 0,00";
-      const ctr = k.tImpressions > 0 ? ((k.tInlineClicks / k.tImpressions) * 100).toFixed(2) + "%" : "0%";
-
-      if(isEcommerce) {
-        const roas = k.tSpend > 0 ? (k.tFaturamento / k.tSpend).toFixed(2).replace('.', ',') : '0,00';
-        const cpa = k.tCompras > 0 ? fmtR(k.tSpend / k.tCompras) : "R$ 0,00";
-
-        container.innerHTML = `
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Investimento</div><div class="text-lg md:text-xl font-bold text-white mt-1">${fmtR(k.tSpend)}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Compras no Site</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtN(k.tCompras)}</div><div class="text-[10px] text-slate-400 mt-1">CPA: ${cpa}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Faturamento Total</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtR(k.tFaturamento)}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ROAS Geral</div><div class="text-lg md:text-xl font-bold text-brand-500 mt-1">${roas}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques no Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Acumulado</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
-        `;
-      } else {
-        container.innerHTML = `
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Investimento</div><div class="text-lg md:text-xl font-bold text-white mt-1">${fmtR(k.tSpend)}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Leads (Form)</div><div class="text-lg md:text-xl font-bold text-indigo-400 mt-1">${fmtN(k.tLeads)}</div><div class="text-[10px] text-slate-400 mt-1">CPL: ${cpl}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Conversas (Msg)</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtN(k.tConversas)}</div><div class="text-[10px] text-slate-400 mt-1">CPMsg: ${cpmsg}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Acumulado</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ThruPlays</div><div class="text-lg md:text-xl font-bold text-purple-400 mt-1">${fmtN(k.tThruplays)}</div></div>
-        `;
-      }
-    }
-
-    function formatAdsetPrice(adsetName) {
-      if (!adsetName || !adsetName.includes("~")) return "";
-      let match = adsetName.match(/~.*?$/);
-      if (match) {
-        return " " + match[0].replace(/R\$/gi, '').replace(/ Mil/gi, 'k').replace(/ Mi/gi, 'M').replace(/\s+/g, '').trim();
-      }
-      return "";
-    }
-
-    function renderDynamicTables(data) {
-      const container = document.getElementById('dynamic-tables-container');
-
-      if (clientMetadata.isRK) {
-        const adMap = {};
-        data.forEach(r => {
-          if (!adMap[r.adid]) {
-            adMap[r.adid] = {
-              id: r.adid, name: r.adname, adsetName: r.asname, campName: r.cname,
-              spend: 0, reach: 0, leads: 0, msgs: 0
-            };
-          }
-          adMap[r.adid].spend += r.spend;
-          adMap[r.adid].reach += r.reach;
-          adMap[r.adid].leads += r.leads;
-          adMap[r.adid].msgs += r.msgs;
+            requestAnimationFrame(async () => {
+                const rawData = await Parser.processFiles(files);
+                const normalizedData = Normalizer.normalize(rawData);
+                const businessType = BusinessDetector.detect(normalizedData);
+                
+                AppState.update({
+                    rawData: rawData,
+                    normalized: normalizedData,
+                    filtered: normalizedData,
+                    settings: { ...AppState.get('settings'), businessType }
+                });
+            });
         });
 
-        const listRK = Object.values(adMap).filter(a => a.spend > 0).sort((a, b) => b.spend - a.spend);
+        /**
+         * ==========================================
+         * MÓDULO 7: METRICS ENGINE
+         * ==========================================
+         */
+        const MetricsEngine = {
+            calculate(data) {
+                let m = {
+                    spend: 0, impressions: 0, clicks: 0, reach: 0, inline_link_clicks: 0,
+                    purchases: 0, revenue: 0, leads: 0, messages: 0, video_views: 0
+                };
 
-        let rowsHTML = "";
-        listRK.forEach(ad => {
-          const isMsg = ad.campName.toLowerCase().includes("mensag") || ad.campName.toLowerCase().includes("whatsapp");
-          const label = isMsg ? "Mensagens" : "Leads";
-          const val = isMsg ? ad.msgs : ad.leads;
-          const custoLabel = isMsg ? "CPMsg" : "CPL";
-          const cpl = val > 0 ? fmtR(ad.spend / val) : "R$ 0,00";
-          const priceTag = formatAdsetPrice(ad.adsetName);
-          const nomeFinal = `${ad.name}<span class="text-emerald-400 font-bold ml-1">${priceTag}</span>`;
+                data.forEach(row => {
+                    m.spend += row.spend;
+                    m.impressions += row.impressions;
+                    m.clicks += row.clicks;
+                    m.reach += row.reach;
+                    m.inline_link_clicks += row.inline_link_clicks;
 
-          rowsHTML += `
-            <tr class="hover:bg-slate-800/50 transition border-b border-slate-700/30">
-              <td class="py-3 px-4 font-semibold text-white">${nomeFinal}</td>
-              <td class="py-3 px-4 text-slate-400 text-xs">${ad.campName}</td>
-              <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(ad.spend)}</td>
-              <td class="py-3 px-4 text-right text-slate-300">${fmtN(ad.reach)}</td>
-              <td class="py-3 px-4 text-right font-bold text-indigo-400">${label}: ${val}</td>
-              <td class="py-3 px-4 text-right text-slate-300">${custoLabel}: ${cpl}</td>
-              <td class="py-3 px-4 text-right text-slate-500 font-mono text-[10px]">MQL: -</td>
-            </tr>
-          `;
+                    m.purchases += (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
+                    m.revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
+                    m.leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
+                    m.messages += (row.actions.messaging_conversation_started_7d || 0) + (row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
+                });
+
+                const cpm = Utils.safeDiv(m.spend, m.impressions) * 1000;
+                const ctr = Utils.safeDiv(m.inline_link_clicks || m.clicks, m.impressions);
+                const cpc = Utils.safeDiv(m.spend, m.inline_link_clicks || m.clicks);
+                const frequency = Utils.safeDiv(m.impressions, m.reach);
+                const roas = Utils.safeDiv(m.revenue, m.spend);
+                const cpa = Utils.safeDiv(m.spend, m.purchases);
+                const ticket = Utils.safeDiv(m.revenue, m.purchases);
+                const cpl = Utils.safeDiv(m.spend, m.leads);
+                const cpmsg = Utils.safeDiv(m.spend, m.messages);
+
+                return { ...m, cpm, ctr, cpc, frequency, roas, cpa, ticket, cpl, cpmsg };
+            }
+        };
+
+        /**
+         * ==========================================
+         * MÓDULO 8: KPIs RENDERER
+         * ==========================================
+         */
+        const KPIs = {
+            render(metrics, businessType) {
+                const container = document.getElementById('kpi-container');
+                if (!container) return;
+
+                let config = [
+                    { label: 'Investimento Total', value: Utils.formatCurrency(metrics.spend), icon: 'dollar-sign', color: 'text-gray-200' },
+                    { label: 'Custo por Clique (CPC)', value: Utils.formatCurrency(metrics.cpc), icon: 'mouse-pointer-2', color: 'text-gray-400' },
+                    { label: 'CPM', value: Utils.formatCurrency(metrics.cpm), icon: 'eye', color: 'text-gray-400' },
+                    { label: 'CTR', value: Utils.formatPercent(metrics.ctr), icon: 'bar-chart-2', color: 'text-gray-400' }
+                ];
+
+                if (businessType === 'ecommerce') {
+                    config.unshift(
+                        { label: 'Receita Gerada', value: Utils.formatCurrency(metrics.revenue), icon: 'trending-up', color: 'text-brand-500' },
+                        { label: 'ROAS', value: Utils.formatNumber(metrics.roas) + 'x', icon: 'zap', color: 'text-yellow-400' },
+                        { label: 'Total de Compras', value: Utils.formatNumber(metrics.purchases), icon: 'shopping-cart', color: 'text-brand-500' },
+                        { label: 'CPA', value: Utils.formatCurrency(metrics.cpa), icon: 'target', color: 'text-red-400' }
+                    );
+                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
+                    config.unshift(
+                        { label: 'Leads Capturados', value: Utils.formatNumber(metrics.leads), icon: 'users', color: 'text-brand-500' },
+                        { label: 'Custo por Lead (CPL)', value: Utils.formatCurrency(metrics.cpl), icon: 'magnet', color: 'text-yellow-400' }
+                    );
+                } else if (businessType === 'messaging') {
+                    config.unshift(
+                        { label: 'Conversas Iniciadas', value: Utils.formatNumber(metrics.messages), icon: 'message-circle', color: 'text-brand-500' },
+                        { label: 'Custo por Mensagem', value: Utils.formatCurrency(metrics.cpmsg), icon: 'smartphone', color: 'text-yellow-400' }
+                    );
+                }
+
+                container.innerHTML = config.map(card => `
+                    <div class="glass-panel p-6 rounded-xl flex flex-col justify-between shadow-card hover:border-brand-500/50 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-sm font-medium text-gray-400">${card.label}</span>
+                            <div class="p-2 bg-surface-800 rounded-lg border border-border-dark">
+                                <i data-lucide="${card.icon}" class="w-5 h-5 ${card.color}"></i>
+                            </div>
+                        </div>
+                        <h4 class="text-3xl font-bold text-white tracking-tight">${card.value}</h4>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        };
+
+        /**
+         * ==========================================
+         * MÓDULO 9: CHARTS ENGINE
+         * ==========================================
+         */
+        const ChartsEngine = {
+            instances: {},
+
+            render(data, businessType) {
+                this.ensureContainers();
+                const timelineData = this.groupDataByDate(data);
+                const campaignData = this.groupDataByCampaign(data);
+                this.renderTimelineChart(timelineData, businessType);
+                this.renderCompositionChart(campaignData);
+            },
+
+            ensureContainers() {
+                const dashboardContent = document.getElementById('dashboard-content');
+                if (!document.getElementById('charts-container')) {
+                    const chartsHTML = `
+                        <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-2">
+                            <div class="glass-panel p-6 rounded-xl shadow-card lg:col-span-2 h-96 flex flex-col">
+                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Desempenho no Tempo</h3>
+                                <div class="relative flex-1 w-full h-full"><canvas id="chart-timeline"></canvas></div>
+                            </div>
+                            <div class="glass-panel p-6 rounded-xl shadow-card lg:col-span-1 h-96 flex flex-col">
+                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Top Campanhas (Gasto)</h3>
+                                <div class="relative flex-1 w-full h-full"><canvas id="chart-composition"></canvas></div>
+                            </div>
+                        </div>
+                    `;
+                    dashboardContent.insertAdjacentHTML('beforeend', chartsHTML);
+                }
+            },
+
+            destroyChart(id) {
+                if (this.instances[id]) this.instances[id].destroy();
+            },
+
+            groupDataByDate(data) {
+                const grouped = {};
+                data.forEach(row => {
+                    if (!row.date_start) return;
+                    const date = row.date_start;
+                    if (!grouped[date]) grouped[date] = { spend: 0, revenue: 0, leads: 0, messages: 0 };
+                    grouped[date].spend += row.spend;
+                    grouped[date].revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
+                    grouped[date].leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
+                    grouped[date].messages += (row.actions.messaging_conversation_started_7d || 0);
+                });
+                return Object.entries(grouped)
+                    .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+                    .reduce((obj, [key, val]) => { obj[key] = val; return obj; }, {});
+            },
+
+            groupDataByCampaign(data) {
+                const grouped = {};
+                data.forEach(row => {
+                    const name = row.campaign_name || 'Desconhecida';
+                    if (!grouped[name]) grouped[name] = 0;
+                    grouped[name] += row.spend;
+                });
+                const sorted = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+                const top5 = sorted.slice(0, 5);
+                const others = sorted.slice(5).reduce((acc, curr) => acc + curr[1], 0);
+                if (others > 0) top5.push(['Outras', others]);
+                return top5;
+            },
+
+            renderTimelineChart(timelineData, businessType) {
+                this.destroyChart('chart-timeline');
+                const ctx = document.getElementById('chart-timeline').getContext('2d');
+                
+                const labels = Object.keys(timelineData);
+                const spendData = labels.map(l => timelineData[l].spend);
+                
+                let secondaryData = [], secondaryLabel = '', secondaryColor = '';
+                if (businessType === 'ecommerce') {
+                    secondaryData = labels.map(l => timelineData[l].revenue);
+                    secondaryLabel = 'Receita (R$)'; secondaryColor = 'rgba(20, 184, 166, 1)';
+                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
+                    secondaryData = labels.map(l => timelineData[l].leads);
+                    secondaryLabel = 'Leads'; secondaryColor = 'rgba(250, 204, 21, 1)';
+                } else {
+                    secondaryData = labels.map(l => timelineData[l].messages);
+                    secondaryLabel = 'Mensagens'; secondaryColor = 'rgba(56, 189, 248, 1)';
+                }
+
+                const gradientSpend = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientSpend.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+                gradientSpend.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+                this.instances['chart-timeline'] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: secondaryLabel, data: secondaryData, borderColor: secondaryColor, backgroundColor: secondaryColor, tension: 0.4, borderWidth: 2, yAxisID: 'y' },
+                            { label: 'Investimento (R$)', data: spendData, borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: gradientSpend, fill: true, tension: 0.4, borderWidth: 2, yAxisID: 'y1' }
+                        ]
+                    },
+                    options: {
+                        ...Config.chartDefaults,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: { x: Config.chartDefaults.scales.x, y: { type: 'linear', position: 'left' }, y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } } }
+                    }
+                });
+            },
+
+            renderCompositionChart(campaignData) {
+                this.destroyChart('chart-composition');
+                const ctx = document.getElementById('chart-composition').getContext('2d');
+                
+                this.instances['chart-composition'] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: campaignData.map(i => i[0]),
+                        datasets: [{
+                            data: campaignData.map(i => i[1]),
+                            backgroundColor: ['#14b8a6', '#0ea5e9', '#8b5cf6', '#f59e0b', '#f43f5e', '#3f3f46'],
+                            borderWidth: 0, hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        ...Config.chartDefaults, cutout: '70%',
+                        plugins: { legend: { position: 'bottom', labels: { padding: 20, color: '#a1a1aa', usePointStyle: true } } }
+                    }
+                });
+            }
+        };
+
+        /**
+         * ==========================================
+         * MÓDULO 10: TABLE ENGINE
+         * ==========================================
+         */
+        const TableEngine = {
+            sortConfig: { key: 'spend', direction: 'desc' },
+            currentData: [], currentBusinessType: 'unknown',
+
+            render(data, businessType) {
+                this.currentBusinessType = businessType;
+                this.ensureContainer();
+                this.currentData = this.aggregateByCampaign(data);
+                this.drawTable();
+            },
+
+            ensureContainer() {
+                const dashboardContent = document.getElementById('dashboard-content');
+                if (!document.getElementById('table-container')) {
+                    const tableHTML = `
+                        <div id="table-container" class="glass-panel rounded-xl shadow-card w-full flex flex-col mt-2 overflow-hidden border border-border-dark">
+                            <div class="p-6 border-b border-border-dark flex justify-between items-center bg-surface-800/50">
+                                <div><h3 class="text-lg font-semibold text-white">Desempenho por Campanha</h3></div>
+                            </div>
+                            <div class="overflow-x-auto scrollbar-hide">
+                                <table class="w-full text-left border-collapse">
+                                    <thead id="table-head" class="bg-surface-900/80 text-xs uppercase text-gray-400 border-b border-border-dark"></thead>
+                                    <tbody id="table-body" class="text-sm text-gray-300 divide-y divide-border-dark"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    dashboardContent.insertAdjacentHTML('beforeend', tableHTML);
+                }
+            },
+
+            aggregateByCampaign(data) {
+                const map = new Map();
+                data.forEach(row => {
+                    const id = row.campaign_id;
+                    if (!map.has(id)) {
+                        map.set(id, {
+                            id: id, name: row.campaign_name, spend: 0, impressions: 0, clicks: 0, reach: 0, link_clicks: 0,
+                            purchases: 0, revenue: 0, leads: 0, messages: 0
+                        });
+                    }
+                    const c = map.get(id);
+                    c.spend += row.spend; c.impressions += row.impressions; c.clicks += row.clicks;
+                    c.reach += row.reach; c.link_clicks += row.inline_link_clicks;
+                    c.purchases += (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
+                    c.revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
+                    c.leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
+                    c.messages += (row.actions.messaging_conversation_started_7d || 0);
+                });
+
+                return Array.from(map.values()).map(c => {
+                    c.cpc = Utils.safeDiv(c.spend, c.link_clicks || c.clicks);
+                    c.cpm = Utils.safeDiv(c.spend, c.impressions) * 1000;
+                    c.ctr = Utils.safeDiv(c.link_clicks || c.clicks, c.impressions);
+                    c.roas = Utils.safeDiv(c.revenue, c.spend);
+                    c.cpa = Utils.safeDiv(c.spend, c.purchases);
+                    c.cpl = Utils.safeDiv(c.spend, c.leads);
+                    c.cpmsg = Utils.safeDiv(c.spend, c.messages);
+                    return c;
+                });
+            },
+
+            getColumns() {
+                const cols = [
+                    { key: 'name', label: 'Campanha', format: 'text' },
+                    { key: 'spend', label: 'Investimento', format: 'currency' },
+                    { key: 'cpc', label: 'CPC', format: 'currency' },
+                    { key: 'ctr', label: 'CTR', format: 'percent' }
+                ];
+
+                const biz = this.currentBusinessType;
+                if (biz === 'ecommerce') {
+                    cols.push({ key: 'revenue', label: 'Receita', format: 'currency' }, { key: 'roas', label: 'ROAS', format: 'number', suffix: 'x' }, { key: 'purchases', label: 'Compras', format: 'number' }, { key: 'cpa', label: 'CPA', format: 'currency' });
+                } else if (biz === 'lead_generation' || biz === 'real_estate') {
+                    cols.push({ key: 'leads', label: 'Leads', format: 'number' }, { key: 'cpl', label: 'CPL', format: 'currency' });
+                } else if (biz === 'messaging') {
+                    cols.push({ key: 'messages', label: 'Mensagens', format: 'number' }, { key: 'cpmsg', label: 'Custo/Msg', format: 'currency' });
+                }
+                return cols;
+            },
+
+            handleSort(key) {
+                if (this.sortConfig.key === key) this.sortConfig.direction = this.sortConfig.direction === 'asc' ? 'desc' : 'asc';
+                else { this.sortConfig.key = key; this.sortConfig.direction = 'desc'; }
+                this.drawTable();
+            },
+
+            drawTable() {
+                const columns = this.getColumns();
+                const { key, direction } = this.sortConfig;
+                
+                const sortedData = [...this.currentData].sort((a, b) => {
+                    let valA = a[key], valB = b[key];
+                    if (typeof valA === 'string') valA = valA.toLowerCase();
+                    if (typeof valB === 'string') valB = valB.toLowerCase();
+                    if (valA < valB) return direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                document.getElementById('table-head').innerHTML = `<tr>
+                    ${columns.map(col => `
+                        <th class="px-6 py-4 font-semibold cursor-pointer hover:text-brand-500 transition-colors select-none whitespace-nowrap group" onclick="TableEngine.handleSort('${col.key}')">
+                            <div class="flex items-center gap-2">${col.label} ${this.sortConfig.key === col.key ? `<i data-lucide="chevron-${this.sortConfig.direction === 'asc' ? 'up' : 'down'}" class="w-4 h-4 text-brand-500"></i>` : `<i data-lucide="chevrons-up-down" class="w-4 h-4 text-gray-600"></i>`}</div>
+                        </th>
+                    `).join('')}
+                </tr>`;
+
+                document.getElementById('table-body').innerHTML = sortedData.map(row => `
+                    <tr class="hover:bg-surface-800/80 transition-colors cursor-default">
+                        ${columns.map(col => {
+                            let value = row[col.key];
+                            if (col.format === 'currency') value = Utils.formatCurrency(value);
+                            else if (col.format === 'percent') value = Utils.formatPercent(value);
+                            else if (col.format === 'number') value = Utils.formatNumber(value) + (col.suffix || '');
+                            
+                            return `<td class="px-6 py-4 whitespace-nowrap ${col.key === 'name' ? 'text-white font-medium max-w-[300px] truncate' : 'text-gray-400'}">${value}</td>`;
+                        }).join('')}
+                    </tr>
+                `).join('');
+
+                lucide.createIcons();
+            }
+        };
+
+        /**
+         * ==========================================
+         * MÓDULO 11: INSIGHTS ENGINE
+         * ==========================================
+         */
+        const InsightsEngine = {
+            render(data, globalMetrics, businessType) {
+                this.ensureContainer();
+                const insights = this.analyze(data, globalMetrics, businessType);
+                this.drawInsights(insights);
+            },
+
+            ensureContainer() {
+                if (!document.getElementById('insights-container')) {
+                    const insightsHTML = `
+                        <div id="insights-container" class="glass-panel p-6 rounded-xl w-full mt-2 border border-brand-500/30 bg-brand-900/10">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="p-2 bg-brand-500/20 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5 text-brand-400 animate-pulse"></i></div>
+                                <div><h3 class="text-lg font-semibold text-white">Smart Insights</h3></div>
+                            </div>
+                            <div id="insights-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                        </div>
+                    `;
+                    const tableContainer = document.getElementById('table-container');
+                    if (tableContainer) tableContainer.insertAdjacentHTML('beforebegin', insightsHTML);
+                    else document.getElementById('dashboard-content').insertAdjacentHTML('beforeend', insightsHTML);
+                }
+            },
+
+            analyze(data, globalMetrics, businessType) {
+                const insights = [];
+                const campaigns = TableEngine.aggregateByCampaign(data);
+                if (campaigns.length === 0 || globalMetrics.spend === 0) return insights;
+
+                const topSpender = [...campaigns].sort((a, b) => b.spend - a.spend)[0];
+                const spendPercent = (topSpender.spend / globalMetrics.spend) * 100;
+                
+                if (spendPercent > 40 && campaigns.length > 1) {
+                    insights.push({ icon: 'alert-triangle', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', title: 'Alerta de Concentração', text: `A campanha <b>"${topSpender.name}"</b> consome <b>${spendPercent.toFixed(1)}%</b> do orçamento.` });
+                }
+
+                if (businessType === 'ecommerce') {
+                    const sortedByRoas = campaigns.filter(c => c.spend > 0 && c.purchases > 0).sort((a, b) => b.roas - a.roas);
+                    if (sortedByRoas.length > 0) {
+                        if (sortedByRoas[0].roas > globalMetrics.roas * 1.3) insights.push({ icon: 'trending-up', color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', title: 'Oportunidade de Escala', text: `<b>"${sortedByRoas[0].name}"</b> tem ROAS de <b>${sortedByRoas[0].roas.toFixed(2)}x</b>.` });
+                    }
+                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
+                    const sortedByCpl = campaigns.filter(c => c.leads > 0).sort((a, b) => a.cpl - b.cpl);
+                    if (sortedByCpl.length > 0) {
+                        if (sortedByCpl[0].cpl < globalMetrics.cpl * 0.75) insights.push({ icon: 'award', color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', title: 'Captação Eficiente', text: `<b>"${sortedByCpl[0].name}"</b> gera leads a <b>${Utils.formatCurrency(sortedByCpl[0].cpl)}</b>.` });
+                    }
+                }
+
+                return insights.slice(0, 3);
+            },
+
+            drawInsights(insights) {
+                const list = document.getElementById('insights-list');
+                if (insights.length === 0) {
+                    list.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500">Nenhuma anomalia crítica detectada.</div>`;
+                    return;
+                }
+                list.innerHTML = insights.map(insight => `
+                    <div class="${insight.bg} border ${insight.border} p-5 rounded-xl flex gap-4 items-start">
+                        <div class="p-2.5 rounded-full bg-surface-900 border ${insight.border} shadow-sm shrink-0 flex items-center justify-center"><i data-lucide="${insight.icon}" class="w-5 h-5 ${insight.color}"></i></div>
+                        <div class="flex-1"><h4 class="text-white font-semibold text-sm mb-1">${insight.title}</h4><p class="text-gray-300 text-xs">${insight.text}</p></div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        };
+
+        /**
+         * ==========================================
+         * MÓDULO 12: FILTERS ENGINE
+         * ==========================================
+         */
+        const FiltersEngine = {
+            init() {
+                this.renderSidebar();
+                this.attachListeners();
+            },
+
+            renderSidebar() {
+                document.getElementById('sidebar-container').innerHTML = `
+                    <div class="p-6 border-b border-border-dark flex items-center gap-3 shrink-0 bg-surface-900/50">
+                        <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+                            <i data-lucide="bar-chart-3" class="text-white w-5 h-5"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-white tracking-tight">MetaAds<span class="text-brand-500 font-light">BI</span></h1>
+                    </div>
+                    
+                    <div class="p-6 flex flex-col gap-8 flex-1 overflow-y-auto">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pesquisar</label>
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
+                                <input type="text" id="filter-search" placeholder="Nome da campanha..." class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors disabled:opacity-50" disabled>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Período de Análise</label>
+                            <div class="space-y-4">
+                                <div>
+                                    <span class="text-xs text-gray-500 block mb-1.5 font-medium">Data Inicial</span>
+                                    <div class="relative">
+                                        <i data-lucide="calendar" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
+                                        <input type="date" id="filter-date-start" class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 transition-colors [color-scheme:dark] disabled:opacity-50" disabled>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500 block mb-1.5 font-medium">Data Final</span>
+                                    <div class="relative">
+                                        <i data-lucide="calendar" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
+                                        <input type="date" id="filter-date-end" class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 transition-colors [color-scheme:dark] disabled:opacity-50" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-border-dark mt-auto">
+                            <button id="filter-clear" disabled class="w-full py-2 bg-surface-800 hover:bg-surface-700 border border-border-dark hover:border-gray-500 rounded-lg text-sm font-medium text-gray-300 flex items-center justify-center gap-2 disabled:opacity-50">
+                                <i data-lucide="filter-x" class="w-4 h-4"></i> Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            },
+
+            attachListeners() {
+                const handleFilterChange = () => {
+                    const search = document.getElementById('filter-search').value.toLowerCase();
+                    const dateStart = document.getElementById('filter-date-start').value;
+                    const dateEnd = document.getElementById('filter-date-end').value;
+                    AppState.update({ filters: { search, dateStart, dateEnd } });
+                };
+
+                document.getElementById('filter-search').addEventListener('input', Utils.debounce(handleFilterChange, 300));
+                document.getElementById('filter-date-start').addEventListener('change', handleFilterChange);
+                document.getElementById('filter-date-end').addEventListener('change', handleFilterChange);
+                document.getElementById('filter-clear').addEventListener('click', () => {
+                    document.getElementById('filter-search').value = '';
+                    document.getElementById('filter-date-start').value = '';
+                    document.getElementById('filter-date-end').value = '';
+                    handleFilterChange();
+                });
+            },
+
+            enableControls() {
+                document.getElementById('filter-search').removeAttribute('disabled');
+                document.getElementById('filter-date-start').removeAttribute('disabled');
+                document.getElementById('filter-date-end').removeAttribute('disabled');
+                document.getElementById('filter-clear').removeAttribute('disabled');
+            },
+
+            applyFilters(normalizedData, filters) {
+                if (!filters.search && !filters.dateStart && !filters.dateEnd) return normalizedData;
+
+                return normalizedData.filter(row => {
+                    if (filters.search && !(row.campaign_name || '').toLowerCase().includes(filters.search)) return false;
+                    if (filters.dateStart && row.date_start && row.date_start < filters.dateStart) return false;
+                    if (filters.dateEnd && row.date_start && row.date_start > filters.dateEnd) return false;
+                    return true;
+                });
+            }
+        };
+
+        FiltersEngine.init();
+
+        /**
+         * ==========================================
+         * MÓDULO 13: TOPBAR ENGINE
+         * ==========================================
+         */
+        const TopbarEngine = {
+            render(count) {
+                const header = document.getElementById('topbar-container');
+                header.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 text-gray-400"></i>
+                        <h2 class="text-sm font-medium text-gray-300">Workspace / <span class="text-white font-semibold">${count} registros processados</span></h2>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        };
+
+        /**
+         * ==========================================
+         * CONEXÃO REATIVA FINAL (Observer Unificado e Limpo)
+         * ==========================================
+         */
+        AppState.subscribe((state, changedKeys) => {
+            if (changedKeys.includes('normalized') || changedKeys.includes('filters')) {
+                const newFilteredData = FiltersEngine.applyFilters(state.normalized, state.filters);
+                state.filtered = newFilteredData; 
+                if (state.normalized.length > 0) FiltersEngine.enableControls();
+            }
+
+            if (changedKeys.includes('filtered') || changedKeys.includes('normalized') || changedKeys.includes('filters')) {
+                const dataToProcess = state.filtered;
+                if (dataToProcess.length === 0) return;
+
+                const globalMetrics = MetricsEngine.calculate(dataToProcess);
+                state.metrics.global = globalMetrics;
+
+                document.getElementById('drop-zone').classList.add('hidden');
+                const dashboardContent = document.getElementById('dashboard-content');
+                dashboardContent.classList.remove('hidden');
+                dashboardContent.classList.add('flex');
+
+                if (!document.getElementById('kpi-container')) {
+                    dashboardContent.insertAdjacentHTML('afterbegin', '<div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full"></div>');
+                }
+
+                TopbarEngine.render(dataToProcess.length);
+                KPIs.render(globalMetrics, state.settings.businessType);
+
+                requestAnimationFrame(() => {
+                    ChartsEngine.render(dataToProcess, state.settings.businessType);
+                    InsightsEngine.render(dataToProcess, globalMetrics, state.settings.businessType);
+                    TableEngine.render(dataToProcess, state.settings.businessType);
+                });
+            }
         });
-
-        container.innerHTML = `
-          <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
-            <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-house-circle-check text-emerald-400"></i> Desempenho por Imóvel / Criativo (Modelo RK)
-              </h3>
-              <span class="text-xs text-slate-400">${listRK.length} imóveis ativos</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th class="py-3 px-4">Imóvel / Anúncio + Ticket</th>
-                    <th class="py-3 px-4">Campanha</th>
-                    <th class="py-3 px-4 text-right">Investimento</th>
-                    <th class="py-3 px-4 text-right">Alcance Acumulado</th>
-                    <th class="py-3 px-4 text-right">Resultado</th>
-                    <th class="py-3 px-4 text-right">Custo Un.</th>
-                    <th class="py-3 px-4 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/50 text-slate-300">
-                  ${rowsHTML}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      } else {
-        const adsetMap = {};
-        data.forEach(r => {
-          if (!adsetMap[r.asid]) {
-            adsetMap[r.asid] = { id: r.asid, name: r.asname, camp: r.cname, spend: 0, leads: 0, conversas: 0, compras: 0, faturamento: 0 };
-          }
-          adsetMap[r.asid].spend += r.spend;
-          adsetMap[r.asid].leads += r.leads;
-          adsetMap[r.asid].conversas += r.msgs;
-          adsetMap[r.asid].compras += r.compras;
-          adsetMap[r.asid].faturamento += r.faturamento;
-        });
-
-        const listAdsets = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-
-        let adsetsHTML = "";
-        listAdsets.forEach(a => {
-          let custoTxt = "R$ 0,00";
-          if (a.leads > 0) custoTxt = `CPL: ${fmtR(a.spend / a.leads)}`;
-          else if (a.conversas > 0) custoTxt = `CPMsg: ${fmtR(a.spend / a.conversas)}`;
-          else if (a.compras > 0) custoTxt = `CPA: ${fmtR(a.spend / a.compras)}`;
-
-          adsetsHTML += `
-            <tr class="hover:bg-slate-800/50 transition border-b border-slate-700/30">
-              <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
-              <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
-              <td class="py-3 px-4 text-slate-400">${a.camp}</td>
-              <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
-              <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
-              <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
-              <td class="py-3 px-4 text-right text-slate-300">${custoTxt}</td>
-            </tr>
-          `;
-        });
-
-        container.innerHTML = `
-          <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
-            <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-building text-brand-500"></i> Desempenho por Conjunto
-              </h3>
-              <span class="text-xs text-slate-400">${listAdsets.length} conjuntos</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th class="py-3 px-4">AdSet ID</th>
-                    <th class="py-3 px-4">Nome do Conjunto</th>
-                    <th class="py-3 px-4">Campanha</th>
-                    <th class="py-3 px-4 text-right">Investimento</th>
-                    <th class="py-3 px-4 text-right">Leads</th>
-                    <th class="py-3 px-4 text-right">Conversas</th>
-                    <th class="py-3 px-4 text-right">Custo / Resultado</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/50 text-slate-300">
-                  ${adsetsHTML}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function renderCharts(data) {
-      // 1. Gráfico Diário
-      const dailyMap = {};
-      data.forEach(r => {
-        const dFmt = r.date.split('-').slice(1).reverse().join('/');
-        if (!dailyMap[dFmt]) dailyMap[dFmt] = { spend: 0, leads: 0, msgs: 0 };
-        dailyMap[dFmt].spend += r.spend;
-        dailyMap[dFmt].leads += r.leads;
-        dailyMap[dFmt].msgs += r.msgs;
-      });
-
-      const trendLabels = Object.keys(dailyMap).sort();
-      const trendSpend = trendLabels.map(d => dailyMap[d].spend);
-      const trendLeads = trendLabels.map(d => dailyMap[d].leads);
-      const trendMsgs = trendLabels.map(d => dailyMap[d].msgs);
-
-      if (chartTrendInstance) chartTrendInstance.destroy();
-      const ctxTrend = document.getElementById('chartDailyTrend').getContext('2d');
-      chartTrendInstance = new Chart(ctxTrend, {
-        type: 'line',
-        data: {
-          labels: trendLabels,
-          datasets: [
-            { label: 'Gasto Diário (R$)', data: trendSpend, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
-            { label: 'Leads', data: trendLeads, borderColor: '#6366f1', backgroundColor: '#6366f1', type: 'bar', borderRadius: 4, yAxisID: 'y1' },
-            { label: 'Mensagens', data: trendMsgs, borderColor: '#38bdf8', backgroundColor: '#38bdf8', type: 'bar', borderRadius: 4, yAxisID: 'y1' }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
-            y: { type: 'linear', display: true, position: 'left', ticks: { color: '#10b981' }, grid: { color: '#334155' } },
-            y1: { type: 'linear', display: true, position: 'right', ticks: { color: '#818cf8' }, grid: { display: false } }
-          },
-          plugins: {
-            legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 11 } } }
-          }
-        }
-      });
-
-      // 2. Donut Campanhas
-      const campSpendMap = {};
-      data.forEach(r => {
-        campSpendMap[r.cname] = (campSpendMap[r.cname] || 0) + r.spend;
-      });
-
-      if (chart1Instance) chart1Instance.destroy();
-      const ctx1 = document.getElementById('chartCampaignSpend').getContext('2d');
-      chart1Instance = new Chart(ctx1, {
-        type: 'doughnut',
-        data: {
-          labels: Object.keys(campSpendMap),
-          datasets: [{
-            data: Object.values(campSpendMap),
-            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
-          }
-        }
-      });
-
-      // 3. Barras Resultados Conjuntos
-      const adsetResultMap = {};
-      data.forEach(r => {
-        if (!adsetResultMap[r.asname]) adsetResultMap[r.asname] = { leads: 0, msgs: 0 };
-        adsetResultMap[r.asname].leads += r.leads;
-        adsetResultMap[r.asname].msgs += r.msgs;
-      });
-
-      const c2Labels = Object.keys(adsetResultMap);
-
-      if (chart2Instance) chart2Instance.destroy();
-      const ctx2 = document.getElementById('chartAdsetResults').getContext('2d');
-      chart2Instance = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: c2Labels,
-          datasets: [
-            { label: 'Leads (Form)', data: c2Labels.map(k => adsetResultMap[k].leads), backgroundColor: '#6366f1', borderRadius: 6 },
-            { label: 'Conversas (Msg)', data: c2Labels.map(k => adsetResultMap[k].msgs), backgroundColor: '#10b981', borderRadius: 6 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
-          },
-          plugins: {
-            legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 10 } } }
-          }
-        }
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
