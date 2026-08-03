@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Meta Ads | RK Imóveis</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+  <!-- Header Header Navbar -->
+  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-brand-600 p-2.5 rounded-xl shadow-lg shadow-brand-500/30">
+          <i class="fa-solid fa-chart-line text-xl text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-wide">RK Imóveis &bull; Performance Dashboard</h1>
+          <p class="text-xs text-slate-400">Dados processados rigorosamente por ID &bull; Julho 2026</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700/50 text-slate-300">
+        <i class="fa-regular fa-calendar text-brand-500"></i>
+        <span id="date-range-badge">01/07/2026 - 31/07/2026</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-6">
+
+    <!-- BARRA DE FILTROS DINÂMICOS -->
+    <section class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-filter text-brand-500"></i> Filtros de Pesquisa
+        </h2>
+        <button onclick="resetFilters()" class="text-xs text-brand-500 hover:text-brand-100 transition flex items-center gap-1">
+          <i class="fa-solid fa-rotate-right"></i> Limpar Filtros
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Filtro Data Inicio -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Data Início</label>
+          <input type="date" id="filter-date-start" value="2026-07-01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <!-- Filtro Data Fim -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Data Fim</label>
+          <input type="date" id="filter-date-end" value="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <!-- Filtro Campanha -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Campanha</label>
+          <select id="filter-campaign" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+            <option value="ALL">Todas as Campanhas</option>
+          </select>
+        </div>
+
+        <!-- Filtro Conjunto/Imovel -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Conjunto / Ticket Imóvel</label>
+          <select id="filter-adset" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+            <option value="ALL">Todos os Conjuntos</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARDS DE KPIs PRINCIPAIS -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <!-- Spend -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg relative overflow-hidden">
+        <div class="text-xs text-slate-400 font-medium">Investimento</div>
+        <div class="text-lg md:text-xl font-bold text-white mt-1" id="kpi-spend">R$ 0,00</div>
+        <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-wallet"></i> Total no período</div>
+      </div>
+
+      <!-- Leads -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
+        <div class="text-xs text-slate-400 font-medium">Leads (Form)</div>
+        <div class="text-lg md:text-xl font-bold text-indigo-400 mt-1" id="kpi-leads">0</div>
+        <div class="text-[10px] text-slate-400 mt-1">CPL: <span id="kpi-cpl" class="text-white font-semibold">R$ 0,00</span></div>
+      </div>
+
+      <!-- Mensagens -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
+        <div class="text-xs text-slate-400 font-medium">Conversas</div>
+        <div class="text-lg md:text-xl font-bold text-emerald-400 mt-1" id="kpi-conversas">0</div>
+        <div class="text-[10px] text-slate-400 mt-1">CPMsg: <span id="kpi-cpmsg" class="text-white font-semibold">R$ 0,00</span></div>
+      </div>
+
+      <!-- Alcance -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
+        <div class="text-xs text-slate-400 font-medium">Alcance</div>
+        <div class="text-lg md:text-xl font-bold text-amber-400 mt-1" id="kpi-reach">0</div>
+        <div class="text-[10px] text-slate-400 mt-1">Contas Atingidas</div>
+      </div>
+
+      <!-- Cliques -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
+        <div class="text-xs text-slate-400 font-medium">Cliques no Link</div>
+        <div class="text-lg md:text-xl font-bold text-sky-400 mt-1" id="kpi-clicks">0</div>
+        <div class="text-[10px] text-slate-400 mt-1">CTR Link: <span id="kpi-ctr" class="text-white font-semibold">0%</span></div>
+      </div>
+
+      <!-- Thruplays -->
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
+        <div class="text-xs text-slate-400 font-medium">ThruPlays</div>
+        <div class="text-lg md:text-xl font-bold text-purple-400 mt-1" id="kpi-thruplays">0</div>
+        <div class="text-[10px] text-slate-400 mt-1">Vídeos Assistidos</div>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS VISUAIS -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-brand-500"></i> Distribuição de Investimento por Campanha
+        </h3>
+        <div class="h-64">
+          <canvas id="chartCampaignSpend"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Leads vs Mensagens por Imóvel (~Ticket)
+        </h3>
+        <div class="h-64">
+          <canvas id="chartAdsetResults"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABELAS DE DETALHAMENTO -->
+    <section class="space-y-6">
+      <!-- Tabela por Conjunto/Imovel -->
+      <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-building text-brand-500"></i> Desempenho por Imóvel / Conjunto
+          </h3>
+          <span class="text-xs text-slate-400" id="adsets-count">0 registros</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3 px-4">AdSet ID</th>
+                <th class="py-3 px-4">Nome do Conjunto</th>
+                <th class="py-3 px-4">Campanha</th>
+                <th class="py-3 px-4 text-right">Investimento</th>
+                <th class="py-3 px-4 text-right">Leads</th>
+                <th class="py-3 px-4 text-right">Conversas</th>
+                <th class="py-3 px-4 text-right">CPL / CPMsg</th>
+              </tr>
+            </thead>
+            <tbody id="table-adsets-body" class="divide-y divide-slate-700/50 text-slate-300">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabela por Anúncio/Criativo -->
+      <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-rectangle-ad text-indigo-400"></i> Top Criativos / Anúncios
+          </h3>
+          <span class="text-xs text-slate-400" id="ads-count">0 registros</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Ad ID</th>
+                <th class="py-3 px-4">Nome do Anúncio</th>
+                <th class="py-3 px-4">Conjunto</th>
+                <th class="py-3 px-4 text-right">Gasto</th>
+                <th class="py-3 px-4 text-right">Alcance</th>
+                <th class="py-3 px-4 text-right">Leads</th>
+                <th class="py-3 px-4 text-right">Mensagens</th>
+                <th class="py-3 px-4 text-right">Cliques Link</th>
+              </tr>
+            </thead>
+            <tbody id="table-ads-body" class="divide-y divide-slate-700/50 text-slate-300">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // DATASET COMPLETO EXTRAÍDO DO META ADS
+    const rawData = [
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"6926135517065","ad_name":"Condomínio Vila Inglesa - 10925","spend":130.91,"reach":6021,"impressions":7430,"clicks":122,"inline_link_clicks":108,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":3},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"6947691720065","ad_name":"AD05 | Terra do Sol - 10954","spend":28.05,"reach":1867,"impressions":2192,"clicks":18,"inline_link_clicks":17,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928065","ad_name":"Condomínio Vila Inglesa - 10925","spend":23.77,"reach":803,"impressions":1007,"clicks":20,"inline_link_clicks":14,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":3,"thruplays":0},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262929665","adset_name":"~R$950 Mil","ad_id":"6962262928465","ad_name":"AD05 | Terra do Sol - 10954","spend":14.28,"reach":581,"impressions":697,"clicks":8,"inline_link_clicks":4,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":1,"thruplays":1},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928665","ad_name":"Video - Condomínio Vila Inglesa - 10925","spend":388.81,"reach":6895,"impressions":12299,"clicks":187,"inline_link_clicks":44,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":14,"thruplays":710},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928865","ad_name":"AD04 | Vila das Palmeiras II - 10958","spend":10.33,"reach":440,"impressions":492,"clicks":8,"inline_link_clicks":3,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":0,"thruplays":1},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262929665","adset_name":"~R$950 Mil","ad_id":"6962262929865","ad_name":"Cannes Club Residence - 10922","spend":447.33,"reach":12110,"impressions":23435,"clicks":351,"inline_link_clicks":212,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":24,"thruplays":45},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"6983996458465","ad_name":"AD06 | Terra do Sol - 10954","spend":223.34,"reach":3368,"impressions":4609,"clicks":78,"inline_link_clicks":48,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":7,"conversas":3,"thruplays":374},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52532170749269","ad_name":"Cannes Club Residence - 10922- v2","spend":43.53,"reach":2293,"impressions":2839,"clicks":36,"inline_link_clicks":31,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52532172429469","ad_name":"Cannes Club Residence - 10922- v3","spend":97.86,"reach":4694,"impressions":5864,"clicks":69,"inline_link_clicks":58,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6962794251465","adset_name":"~R$500 Mil","ad_id":"52538872877669","ad_name":"AD05","spend":44.48,"reach":2304,"impressions":2777,"clicks":31,"inline_link_clicks":23,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52538889171669","ad_name":"Cannes Club Residence - 10922- v4 Carrossel","spend":27.23,"reach":1914,"impressions":2297,"clicks":38,"inline_link_clicks":32,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52538894344069","ad_name":"Gaivotas Residence - 3244 - Carrossel v2","spend":23.17,"reach":347,"impressions":435,"clicks":9,"inline_link_clicks":8,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52538900784469","ad_name":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":215.06,"reach":10119,"impressions":14182,"clicks":217,"inline_link_clicks":187,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":5,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539071259869","ad_name":"AD06 | Terra do Sol - 10954 - video 2","spend":8.44,"reach":263,"impressions":276,"clicks":0,"inline_link_clicks":0,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":4},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52539179803469","ad_name":"Gaivotas Residence - 3244 —v2","spend":202.17,"reach":8038,"impressions":9972,"clicks":151,"inline_link_clicks":123,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":3,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52539184463869","ad_name":"Gaivotas Residence - 3244 — v3","spend":706.92,"reach":21807,"impressions":34650,"clicks":569,"inline_link_clicks":454,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":13,"conversas":2,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539185696269","ad_name":"Cannes Club Residence - 10922- v5","spend":26.65,"reach":329,"impressions":366,"clicks":4,"inline_link_clicks":2,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539186565669","ad_name":"Cannes Club Residence - 10922- v6","spend":9.09,"reach":134,"impressions":148,"clicks":1,"inline_link_clicks":1,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52539186812069","ad_name":"Condomínio Vila Inglesa - 10925 — v2","spend":175.87,"reach":7603,"impressions":9975,"clicks":149,"inline_link_clicks":127,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52539187284669","ad_name":"AD04 | Vila das Palmeiras II - 10958 - v2","spend":32.24,"reach":1578,"impressions":1831,"clicks":37,"inline_link_clicks":30,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539188990069","ad_name":"AD06 | Terra do Sol - 10954 — v2","spend":89.27,"reach":2438,"impressions":3080,"clicks":39,"inline_link_clicks":31,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":2,"conversas":0,"thruplays":0},
+      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6962794251465","adset_name":"~R$500 Mil","ad_id":"52539189757669","ad_name":"Enjoy AD06","spend":1445.58,"reach":21320,"impressions":39154,"clicks":464,"inline_link_clicks":405,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":21,"conversas":6,"thruplays":0},
+      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"52554818600669","ad_name":"Carrocel - Condomínio Vila Inglesa - 10925","spend":32.98,"reach":1098,"impressions":1534,"clicks":14,"inline_link_clicks":12,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":1,"thruplays":0}
+    ];
+
+    let chart1Instance = null;
+    let chart2Instance = null;
+
+    // FORMATADORES
+    const fmtR = (v) => "R$ " + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtN = (v) => (v || 0).toLocaleString('pt-BR');
+
+    // INICIALIZAÇÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      populateDropdowns();
+      setupEventListeners();
+      updateDashboard();
+    });
+
+    function populateDropdowns() {
+      const campSelect = document.getElementById('filter-campaign');
+      const adsetSelect = document.getElementById('filter-adset');
+
+      // Unique Campaigns
+      const camps = {};
+      const adsets = {};
+
+      rawData.forEach(r => {
+        camps[r.campaign_id] = r.campaign_name;
+        adsets[r.adset_id] = `${r.adset_name} (${r.campaign_name})`;
+      });
+
+      Object.keys(camps).forEach(cid => {
+        const opt = document.createElement('option');
+        opt.value = cid;
+        opt.textContent = camps[cid];
+        campSelect.appendChild(opt);
+      });
+
+      Object.keys(adsets).forEach(aid => {
+        const opt = document.createElement('option');
+        opt.value = aid;
+        opt.textContent = adsets[aid];
+        adsetSelect.appendChild(opt);
+      });
+    }
+
+    function setupEventListeners() {
+      document.getElementById('filter-date-start').addEventListener('change', updateDashboard);
+      document.getElementById('filter-date-end').addEventListener('change', updateDashboard);
+      document.getElementById('filter-campaign').addEventListener('change', updateDashboard);
+      document.getElementById('filter-adset').addEventListener('change', updateDashboard);
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-date-start').value = '2026-07-01';
+      document.getElementById('filter-date-end').value = '2026-07-31';
+      document.getElementById('filter-campaign').value = 'ALL';
+      document.getElementById('filter-adset').value = 'ALL';
+      updateDashboard();
+    }
+
+    function getFilteredData() {
+      const dStart = document.getElementById('filter-date-start').value;
+      const dEnd = document.getElementById('filter-date-end').value;
+      const campId = document.getElementById('filter-campaign').value;
+      const adsetId = document.getElementById('filter-adset').value;
+
+      return rawData.filter(r => {
+        if (dStart && r.date_start < dStart) return false;
+        if (dEnd && r.date_stop > dEnd) return false;
+        if (campId !== 'ALL' && r.campaign_id !== campId) return false;
+        if (adsetId !== 'ALL' && r.adset_id !== adsetId) return false;
+        return true;
+      });
+    }
+
+    function updateDashboard() {
+      const filtered = getFilteredData();
+
+      // Recalcular KPIs por ID
+      let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tClicks = 0, tInlineClicks = 0, tThruplays = 0;
+      let spendLeadsCamp = 0, spendMsgCamp = 0;
+
+      filtered.forEach(r => {
+        tSpend += r.spend;
+        tLeads += r.leads;
+        tConversas += r.conversas;
+        tReach += r.reach;
+        tImpressions += r.impressions;
+        tClicks += r.clicks;
+        tInlineClicks += r.inline_link_clicks;
+        tThruplays += r.thruplays;
+
+        if (r.campaign_name.toLowerCase().includes('form') || r.campaign_name.toLowerCase().includes('lead')) {
+          spendLeadsCamp += r.spend;
+        }
+        if (r.campaign_name.toLowerCase().includes('mensag') || r.campaign_name.toLowerCase().includes('whatsapp')) {
+          spendMsgCamp += r.spend;
+        }
+      });
+
+      // Atualizar Cards KPI
+      document.getElementById('kpi-spend').textContent = fmtR(tSpend);
+      document.getElementById('kpi-leads').textContent = fmtN(tLeads);
+      document.getElementById('kpi-conversas').textContent = fmtN(tConversas);
+      document.getElementById('kpi-reach').textContent = fmtN(tReach);
+      document.getElementById('kpi-clicks').textContent = fmtN(tInlineClicks);
+      document.getElementById('kpi-thruplays').textContent = fmtN(tThruplays);
+
+      const cpl = tLeads > 0 ? fmtR(spendLeadsCamp / tLeads) : "R$ 0,00";
+      const cpmsg = tConversas > 0 ? fmtR((spendMsgCamp > 0 ? spendMsgCamp : tSpend) / tConversas) : "R$ 0,00";
+      const ctr = tImpressions > 0 ? ((tInlineClicks / tImpressions) * 100).toFixed(2) + "%" : "0%";
+
+      document.getElementById('kpi-cpl').textContent = cpl;
+      document.getElementById('kpi-cpmsg').textContent = cpmsg;
+      document.getElementById('kpi-ctr').textContent = ctr;
+
+      // Renderizar Tabelas e Gráficos
+      renderAdsetsTable(filtered);
+      renderAdsTable(filtered);
+      renderCharts(filtered);
+    }
+
+    function renderAdsetsTable(data) {
+      const tbody = document.getElementById('table-adsets-body');
+      tbody.innerHTML = '';
+
+      // Agrupar estritamente por adset_id
+      const adsetMap = {};
+      data.forEach(r => {
+        if (!adsetMap[r.adset_id]) {
+          adsetMap[r.adset_id] = { id: r.adset_id, name: r.adset_name, camp: r.campaign_name, spend: 0, leads: 0, conversas: 0 };
+        }
+        adsetMap[r.adset_id].spend += r.spend;
+        adsetMap[r.adset_id].leads += r.leads;
+        adsetMap[r.adset_id].conversas += r.conversas;
+      });
+
+      const list = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
+      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto`;
+
+      list.forEach(a => {
+        let custoTxt = "R$ 0,00";
+        if (a.leads > 0) custoTxt = `CPL: ${fmtR(a.spend / a.leads)}`;
+        else if (a.conversas > 0) custoTxt = `CPMsg: ${fmtR(a.spend / a.conversas)}`;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
+          <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
+          <td class="py-3 px-4 text-slate-400">${a.camp}</td>
+          <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
+          <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
+          <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
+          <td class="py-3 px-4 text-right text-slate-300">${custoTxt}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAdsTable(data) {
+      const tbody = document.getElementById('table-ads-body');
+      tbody.innerHTML = '';
+
+      // Agrupar estritamente por ad_id
+      const adMap = {};
+      data.forEach(r => {
+        if (!adMap[r.ad_id]) {
+          adMap[r.ad_id] = { id: r.ad_id, name: r.ad_name, adset_name: r.adset_name, spend: 0, reach: 0, leads: 0, conversas: 0, clicks: 0 };
+        }
+        adMap[r.ad_id].spend += r.spend;
+        adMap[r.ad_id].reach += r.reach;
+        adMap[r.ad_id].leads += r.leads;
+        adMap[r.ad_id].conversas += r.conversas;
+        adMap[r.ad_id].clicks += r.inline_link_clicks;
+      });
+
+      const list = Object.values(adMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
+      document.getElementById('ads-count').textContent = `${list.length} anúncios ativos`;
+
+      list.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
+          <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
+          <td class="py-3 px-4 text-slate-400">${a.adset_name}</td>
+          <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
+          <td class="py-3 px-4 text-right text-slate-300">${fmtN(a.reach)}</td>
+          <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
+          <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
+          <td class="py-3 px-4 text-right text-sky-400">${fmtN(a.clicks)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCharts(data) {
+      // Agrupamento de Campanhas para o Gráfico 1
+      const campSpendMap = {};
+      data.forEach(r => {
+        campSpendMap[r.campaign_name] = (campSpendMap[r.campaign_name] || 0) + r.spend;
+      });
+
+      const c1Labels = Object.keys(campSpendMap);
+      const c1Data = Object.values(campSpendMap);
+
+      if (chart1Instance) chart1Instance.destroy();
+      const ctx1 = document.getElementById('chartCampaignSpend').getContext('2d');
+      chart1Instance = new Chart(ctx1, {
+        type: 'doughnuts' in Chart ? 'doughnut' : 'pie',
+        data: {
+          labels: c1Labels,
+          datasets: [{
+            data: c1Data,
+            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
+          }
+        }
+      });
+
+      // Agrupamento por Conjunto/Imóvel para o Gráfico 2
+      const adsetResultMap = {};
+      data.forEach(r => {
+        if (!adsetResultMap[r.adset_name]) adsetResultMap[r.adset_name] = { leads: 0, conversas: 0 };
+        adsetResultMap[r.adset_name].leads += r.leads;
+        adsetResultMap[r.adset_name].conversas += r.conversas;
+      });
+
+      const c2Labels = Object.keys(adsetResultMap);
+      const c2Leads = c2Labels.map(k => adsetResultMap[k].leads);
+      const c2Conversas = c2Labels.map(k => adsetResultMap[k].conversas);
+
+      if (chart2Instance) chart2Instance.destroy();
+      const ctx2 = document.getElementById('chartAdsetResults').getContext('2d');
+      chart2Instance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: c2Labels,
+          datasets: [
+            { label: 'Leads (Form)', data: c2Leads, backgroundColor: '#6366f1', borderRadius: 6 },
+            { label: 'Conversas (Msg)', data: c2Conversas, backgroundColor: '#10b981', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
