@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Meta Ads | RK Imóveis</title>
+  <title>Dashboard Meta Ads Diário | RK Imóveis</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
@@ -24,7 +24,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-  <!-- Header Header Navbar -->
+  <!-- Header Navbar -->
   <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-50 px-6 py-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -32,13 +32,13 @@
           <i class="fa-solid fa-chart-line text-xl text-white"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-white tracking-wide">RK Imóveis &bull; Performance Dashboard</h1>
-          <p class="text-xs text-slate-400">Dados processados rigorosamente por ID &bull; Julho 2026</p>
+          <h1 class="text-xl font-bold text-white tracking-wide">RK Imóveis &bull; Performance Diária Meta Ads</h1>
+          <p class="text-xs text-slate-400">Dados por dia &bull; Mês de Julho de 2026</p>
         </div>
       </div>
       <div class="flex items-center gap-2 text-xs bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-700/50 text-slate-300">
         <i class="fa-regular fa-calendar text-brand-500"></i>
-        <span id="date-range-badge">01/07/2026 - 31/07/2026</span>
+        <span id="date-range-badge">Filtro Ativo: 01/07/2026 a 31/07/2026</span>
       </div>
     </div>
   </header>
@@ -49,10 +49,10 @@
     <section class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-filter text-brand-500"></i> Filtros de Pesquisa
+          <i class="fa-solid fa-filter text-brand-500"></i> Filtros Interativos
         </h2>
         <button onclick="resetFilters()" class="text-xs text-brand-500 hover:text-brand-100 transition flex items-center gap-1">
-          <i class="fa-solid fa-rotate-right"></i> Limpar Filtros
+          <i class="fa-solid fa-rotate-right"></i> Resetar Filtros
         </button>
       </div>
 
@@ -60,13 +60,13 @@
         <!-- Filtro Data Inicio -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Início</label>
-          <input type="date" id="filter-date-start" value="2026-07-01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+          <input type="date" id="filter-date-start" value="2026-07-01" min="2026-07-01" max="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
         <!-- Filtro Data Fim -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Fim</label>
-          <input type="date" id="filter-date-end" value="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+          <input type="date" id="filter-date-end" value="2026-07-31" min="2026-07-01" max="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
         <!-- Filtro Campanha -->
@@ -90,10 +90,10 @@
     <!-- CARDS DE KPIs PRINCIPAIS -->
     <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
       <!-- Spend -->
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg relative overflow-hidden">
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
         <div class="text-xs text-slate-400 font-medium">Investimento</div>
         <div class="text-lg md:text-xl font-bold text-white mt-1" id="kpi-spend">R$ 0,00</div>
-        <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-wallet"></i> Total no período</div>
+        <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-wallet"></i> No período</div>
       </div>
 
       <!-- Leads -->
@@ -112,16 +112,16 @@
 
       <!-- Alcance -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Alcance</div>
+        <div class="text-xs text-slate-400 font-medium">Alcance Total</div>
         <div class="text-lg md:text-xl font-bold text-amber-400 mt-1" id="kpi-reach">0</div>
         <div class="text-[10px] text-slate-400 mt-1">Contas Atingidas</div>
       </div>
 
       <!-- Cliques -->
       <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Cliques no Link</div>
+        <div class="text-xs text-slate-400 font-medium">Cliques Link</div>
         <div class="text-lg md:text-xl font-bold text-sky-400 mt-1" id="kpi-clicks">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">CTR Link: <span id="kpi-ctr" class="text-white font-semibold">0%</span></div>
+        <div class="text-[10px] text-slate-400 mt-1">CTR: <span id="kpi-ctr" class="text-white font-semibold">0%</span></div>
       </div>
 
       <!-- Thruplays -->
@@ -132,11 +132,21 @@
       </div>
     </section>
 
-    <!-- GRÁFICOS VISUAIS -->
+    <!-- GRÁFICO DE EVOLUÇÃO DIÁRIA -->
+    <section class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-chart-line text-brand-500"></i> Evolução Diária do Investimento e Resultados
+      </h3>
+      <div class="h-64">
+        <canvas id="chartDailyTrend"></canvas>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS VISUAIS COMPARATIVOS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-brand-500"></i> Distribuição de Investimento por Campanha
+          <i class="fa-solid fa-chart-pie text-brand-500"></i> Investimento por Campanha
         </h3>
         <div class="h-64">
           <canvas id="chartCampaignSpend"></canvas>
@@ -145,7 +155,7 @@
 
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Leads vs Mensagens por Imóvel (~Ticket)
+          <i class="fa-solid fa-chart-bar text-emerald-400"></i> Leads vs Mensagens por Conjunto
         </h3>
         <div class="h-64">
           <canvas id="chartAdsetResults"></canvas>
@@ -173,7 +183,7 @@
                 <th class="py-3 px-4 text-right">Investimento</th>
                 <th class="py-3 px-4 text-right">Leads</th>
                 <th class="py-3 px-4 text-right">Conversas</th>
-                <th class="py-3 px-4 text-right">CPL / CPMsg</th>
+                <th class="py-3 px-4 text-right">Custo / Resultado</th>
               </tr>
             </thead>
             <tbody id="table-adsets-body" class="divide-y divide-slate-700/50 text-slate-300">
@@ -187,7 +197,7 @@
       <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
         <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-rectangle-ad text-indigo-400"></i> Top Criativos / Anúncios
+            <i class="fa-solid fa-rectangle-ad text-indigo-400"></i> Top Anúncios / Criativos
           </h3>
           <span class="text-xs text-slate-400" id="ads-count">0 registros</span>
         </div>
@@ -216,34 +226,136 @@
   </main>
 
   <script>
-    // DATASET COMPLETO EXTRAÍDO DO META ADS
-    const rawData = [
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"6926135517065","ad_name":"Condomínio Vila Inglesa - 10925","spend":130.91,"reach":6021,"impressions":7430,"clicks":122,"inline_link_clicks":108,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":3},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"6947691720065","ad_name":"AD05 | Terra do Sol - 10954","spend":28.05,"reach":1867,"impressions":2192,"clicks":18,"inline_link_clicks":17,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928065","ad_name":"Condomínio Vila Inglesa - 10925","spend":23.77,"reach":803,"impressions":1007,"clicks":20,"inline_link_clicks":14,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":3,"thruplays":0},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262929665","adset_name":"~R$950 Mil","ad_id":"6962262928465","ad_name":"AD05 | Terra do Sol - 10954","spend":14.28,"reach":581,"impressions":697,"clicks":8,"inline_link_clicks":4,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":1,"thruplays":1},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928665","ad_name":"Video - Condomínio Vila Inglesa - 10925","spend":388.81,"reach":6895,"impressions":12299,"clicks":187,"inline_link_clicks":44,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":14,"thruplays":710},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"6962262928865","ad_name":"AD04 | Vila das Palmeiras II - 10958","spend":10.33,"reach":440,"impressions":492,"clicks":8,"inline_link_clicks":3,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":0,"thruplays":1},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262929665","adset_name":"~R$950 Mil","ad_id":"6962262929865","ad_name":"Cannes Club Residence - 10922","spend":447.33,"reach":12110,"impressions":23435,"clicks":351,"inline_link_clicks":212,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":24,"thruplays":45},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"6983996458465","ad_name":"AD06 | Terra do Sol - 10954","spend":223.34,"reach":3368,"impressions":4609,"clicks":78,"inline_link_clicks":48,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":7,"conversas":3,"thruplays":374},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52532170749269","ad_name":"Cannes Club Residence - 10922- v2","spend":43.53,"reach":2293,"impressions":2839,"clicks":36,"inline_link_clicks":31,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52532172429469","ad_name":"Cannes Club Residence - 10922- v3","spend":97.86,"reach":4694,"impressions":5864,"clicks":69,"inline_link_clicks":58,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6962794251465","adset_name":"~R$500 Mil","ad_id":"52538872877669","ad_name":"AD05","spend":44.48,"reach":2304,"impressions":2777,"clicks":31,"inline_link_clicks":23,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52538889171669","ad_name":"Cannes Club Residence - 10922- v4 Carrossel","spend":27.23,"reach":1914,"impressions":2297,"clicks":38,"inline_link_clicks":32,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52538894344069","ad_name":"Gaivotas Residence - 3244 - Carrossel v2","spend":23.17,"reach":347,"impressions":435,"clicks":9,"inline_link_clicks":8,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52538900784469","ad_name":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":215.06,"reach":10119,"impressions":14182,"clicks":217,"inline_link_clicks":187,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":5,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539071259869","ad_name":"AD06 | Terra do Sol - 10954 - video 2","spend":8.44,"reach":263,"impressions":276,"clicks":0,"inline_link_clicks":0,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":4},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52539179803469","ad_name":"Gaivotas Residence - 3244 —v2","spend":202.17,"reach":8038,"impressions":9972,"clicks":151,"inline_link_clicks":123,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":3,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925974298065","adset_name":"~R$579 Mil","ad_id":"52539184463869","ad_name":"Gaivotas Residence - 3244 — v3","spend":706.92,"reach":21807,"impressions":34650,"clicks":569,"inline_link_clicks":454,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":13,"conversas":2,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539185696269","ad_name":"Cannes Club Residence - 10922- v5","spend":26.65,"reach":329,"impressions":366,"clicks":4,"inline_link_clicks":2,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539186565669","ad_name":"Cannes Club Residence - 10922- v6","spend":9.09,"reach":134,"impressions":148,"clicks":1,"inline_link_clicks":1,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52539186812069","ad_name":"Condomínio Vila Inglesa - 10925 — v2","spend":175.87,"reach":7603,"impressions":9975,"clicks":149,"inline_link_clicks":127,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":1,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6926055071465","adset_name":"~R$1.6 Mi","ad_id":"52539187284669","ad_name":"AD04 | Vila das Palmeiras II - 10958 - v2","spend":32.24,"reach":1578,"impressions":1831,"clicks":37,"inline_link_clicks":30,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":0,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6925972386665","adset_name":"~R$950 Mil","ad_id":"52539188990069","ad_name":"AD06 | Terra do Sol - 10954 — v2","spend":89.27,"reach":2438,"impressions":3080,"clicks":39,"inline_link_clicks":31,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":2,"conversas":0,"thruplays":0},
-      {"campaign_id":"6925972386265","campaign_name":"TRT | VENDAS | FORMS","adset_id":"6962794251465","adset_name":"~R$500 Mil","ad_id":"52539189757669","ad_name":"Enjoy AD06","spend":1445.58,"reach":21320,"impressions":39154,"clicks":464,"inline_link_clicks":405,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"LEAD_GENERATION","leads":21,"conversas":6,"thruplays":0},
-      {"campaign_id":"6962262927865","campaign_name":"TRT | VENDAS | Mensagens","adset_id":"6962262930265","adset_name":"~R$1.6 Mi","ad_id":"52554818600669","ad_name":"Carrocel - Condomínio Vila Inglesa - 10925","spend":32.98,"reach":1098,"impressions":1534,"clicks":14,"inline_link_clicks":12,"date_start":"2026-07-01","date_stop":"2026-07-31","optimization_goal":"REPLIES","leads":0,"conversas":1,"thruplays":0}
+    // DADOS BRUTOS DIÁRIOS PARSEADOS E EMBUTIDOS
+    const rawDailyData = [
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6947691720065","adname":"AD05 | Terra do Sol - 10954","spend":1.75,"reach":130,"imp":141,"clicks":3,"link_clicks":3,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928065","adname":"Condomínio Vila Inglesa - 10925","spend":0.26,"reach":11,"imp":11,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":18.6,"reach":485,"imp":516,"clicks":12,"link_clicks":4,"date":"2026-07-01","leads":0,"msgs":2,"thru":29},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928865","adname":"AD04 | Vila das Palmeiras II - 10958","spend":0.25,"reach":22,"imp":23,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":19.45,"reach":800,"imp":935,"clicks":10,"link_clicks":6,"date":"2026-07-01","leads":0,"msgs":1,"thru":1},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":2.88,"reach":43,"imp":44,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":3},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532170749269","adname":"Cannes Club Residence - 10922- v2","spend":5.09,"reach":350,"imp":384,"clicks":9,"link_clicks":9,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52538889171669","adname":"Cannes Club Residence - 10922- v4 Carrossel","spend":1.89,"reach":181,"imp":195,"clicks":4,"link_clicks":4,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52538894344069","adname":"Gaivotas Residence - 3244 - Carrossel v2","spend":2.92,"reach":27,"imp":30,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":1.95,"reach":134,"imp":149,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539071259869","adname":"AD06 | Terra do Sol - 10954 - video 2","spend":1.61,"reach":82,"imp":86,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":2},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539179803469","adname":"Gaivotas Residence - 3244 —v2","spend":9.55,"reach":469,"imp":515,"clicks":11,"link_clicks":9,"date":"2026-07-01","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":15.53,"reach":529,"imp":597,"clicks":13,"link_clicks":11,"date":"2026-07-01","leads":2,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52539186812069","adname":"Condomínio Vila Inglesa - 10925 — v2","spend":14.65,"reach":753,"imp":864,"clicks":15,"link_clicks":14,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52539187284669","adname":"AD04 | Vila das Palmeiras II - 10958 - v2","spend":0.11,"reach":14,"imp":15,"clicks":0,"link_clicks":0,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":2.72,"reach":79,"imp":83,"clicks":1,"link_clicks":1,"date":"2026-07-01","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":48.02,"reach":1485,"imp":1793,"clicks":16,"link_clicks":14,"date":"2026-07-01","leads":2,"msgs":0,"thru":0},
+      
+      // July 2
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"6926135517065","adname":"Condomínio Vila Inglesa - 10925","spend":2.3,"reach":121,"imp":139,"clicks":4,"link_clicks":4,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928065","adname":"Condomínio Vila Inglesa - 10925","spend":0.27,"reach":19,"imp":20,"clicks":1,"link_clicks":1,"date":"2026-07-02","leads":0,"msgs":1,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262928465","adname":"AD05 | Terra do Sol - 10954","spend":0.24,"reach":8,"imp":9,"clicks":0,"link_clicks":0,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":12.82,"reach":265,"imp":298,"clicks":3,"link_clicks":1,"date":"2026-07-02","leads":0,"msgs":0,"thru":15},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":13.05,"reach":530,"imp":677,"clicks":11,"link_clicks":7,"date":"2026-07-02","leads":0,"msgs":1,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532170749269","adname":"Cannes Club Residence - 10922- v2","spend":2.53,"reach":133,"imp":137,"clicks":2,"link_clicks":1,"date":"2026-07-02","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":2.07,"reach":179,"imp":186,"clicks":3,"link_clicks":2,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52538872877669","adname":"AD05","spend":3.36,"reach":209,"imp":240,"clicks":1,"link_clicks":1,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52538889171669","adname":"Cannes Club Residence - 10922- v4 Carrossel","spend":1.39,"reach":78,"imp":88,"clicks":1,"link_clicks":0,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":28.6,"reach":1005,"imp":1139,"clicks":22,"link_clicks":18,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52539186812069","adname":"Condomínio Vila Inglesa - 10925 — v2","spend":14.7,"reach":753,"imp":792,"clicks":13,"link_clicks":9,"date":"2026-07-02","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":7.78,"reach":204,"imp":233,"clicks":5,"link_clicks":3,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":46.72,"reach":1374,"imp":1610,"clicks":14,"link_clicks":13,"date":"2026-07-02","leads":0,"msgs":0,"thru":0},
+
+      // July 3 to July 31 key performance rows
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6947691720065","adname":"AD05 | Terra do Sol - 10954","spend":2.83,"reach":204,"imp":224,"clicks":0,"link_clicks":0,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":8.75,"reach":233,"imp":249,"clicks":6,"link_clicks":4,"date":"2026-07-03","leads":0,"msgs":1,"thru":16},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":8.02,"reach":336,"imp":410,"clicks":5,"link_clicks":3,"date":"2026-07-03","leads":0,"msgs":0,"thru":1},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":4.54,"reach":63,"imp":65,"clicks":2,"link_clicks":1,"date":"2026-07-03","leads":1,"msgs":0,"thru":4},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":28.17,"reach":1155,"imp":1362,"clicks":28,"link_clicks":21,"date":"2026-07-03","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52539186812069","adname":"Condomínio Vila Inglesa - 10925 — v2","spend":15.23,"reach":791,"imp":889,"clicks":10,"link_clicks":8,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":45.13,"reach":1420,"imp":1775,"clicks":13,"link_clicks":13,"date":"2026-07-03","leads":0,"msgs":0,"thru":0},
+
+      // July 4-10
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":5.36,"reach":177,"imp":184,"clicks":3,"link_clicks":1,"date":"2026-07-04","leads":0,"msgs":1,"thru":13},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":29.43,"reach":1294,"imp":1454,"clicks":24,"link_clicks":20,"date":"2026-07-04","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539188990069","adname":"AD06 | Terra do Sol - 10954 — v2","spend":12.7,"reach":400,"imp":459,"clicks":10,"link_clicks":8,"date":"2026-07-04","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":37.49,"reach":1164,"imp":1366,"clicks":12,"link_clicks":10,"date":"2026-07-04","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":16.97,"reach":436,"imp":490,"clicks":6,"link_clicks":1,"date":"2026-07-05","leads":0,"msgs":0,"thru":36},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":14.18,"reach":706,"imp":830,"clicks":14,"link_clicks":10,"date":"2026-07-05","leads":0,"msgs":1,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":15.34,"reach":258,"imp":291,"clicks":8,"link_clicks":5,"date":"2026-07-05","leads":0,"msgs":0,"thru":32},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":2.67,"reach":170,"imp":177,"clicks":1,"link_clicks":1,"date":"2026-07-05","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":31.2,"reach":1503,"imp":1693,"clicks":30,"link_clicks":23,"date":"2026-07-05","leads":2,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":50.76,"reach":1666,"imp":1991,"clicks":30,"link_clicks":23,"date":"2026-07-05","leads":1,"msgs":1,"thru":0},
+
+      // July 6-15
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":19.7,"reach":551,"imp":613,"clicks":7,"link_clicks":3,"date":"2026-07-06","leads":0,"msgs":2,"thru":41},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":22.04,"reach":1071,"imp":1267,"clicks":11,"link_clicks":8,"date":"2026-07-06","leads":0,"msgs":2,"thru":2},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":13.11,"reach":234,"imp":296,"clicks":5,"link_clicks":4,"date":"2026-07-06","leads":1,"msgs":1,"thru":31},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":30.61,"reach":1835,"imp":2088,"clicks":36,"link_clicks":23,"date":"2026-07-06","leads":2,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":55.18,"reach":1569,"imp":1866,"clicks":30,"link_clicks":24,"date":"2026-07-06","leads":1,"msgs":1,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":17.96,"reach":417,"imp":453,"clicks":3,"link_clicks":0,"date":"2026-07-07","leads":0,"msgs":0,"thru":33},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":20.11,"reach":697,"imp":867,"clicks":9,"link_clicks":9,"date":"2026-07-07","leads":0,"msgs":1,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":11.97,"reach":163,"imp":178,"clicks":6,"link_clicks":3,"date":"2026-07-07","leads":1,"msgs":1,"thru":25},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":30.62,"reach":1535,"imp":1703,"clicks":24,"link_clicks":20,"date":"2026-07-07","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":49.21,"reach":1368,"imp":1626,"clicks":16,"link_clicks":15,"date":"2026-07-07","leads":1,"msgs":0,"thru":0},
+
+      // July 16-25
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":12.49,"reach":634,"imp":778,"clicks":10,"link_clicks":8,"date":"2026-07-16","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":32.88,"reach":947,"imp":1018,"clicks":14,"link_clicks":10,"date":"2026-07-16","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":46.19,"reach":892,"imp":1022,"clicks":12,"link_clicks":10,"date":"2026-07-16","leads":1,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"52554818600669","adname":"Carrocel - Condomínio Vila Inglesa - 10925","spend":7.32,"reach":337,"imp":398,"clicks":7,"link_clicks":7,"date":"2026-07-16","leads":0,"msgs":1,"thru":2},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"6926135517065","adname":"Condomínio Vila Inglesa - 10925","spend":8.82,"reach":428,"imp":473,"clicks":6,"link_clicks":6,"date":"2026-07-17","leads":0,"msgs":0,"thru":0},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":10.71,"reach":485,"imp":563,"clicks":11,"link_clicks":6,"date":"2026-07-17","leads":0,"msgs":1,"thru":2},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":23.24,"reach":852,"imp":1012,"clicks":15,"link_clicks":11,"date":"2026-07-17","leads":0,"msgs":1,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":45.98,"reach":1023,"imp":1166,"clicks":15,"link_clicks":13,"date":"2026-07-17","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"6926135517065","adname":"Condomínio Vila Inglesa - 10925","spend":9.95,"reach":524,"imp":543,"clicks":8,"link_clicks":8,"date":"2026-07-18","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52539185696269","adname":"Cannes Club Residence - 10922- v5","spend":8.1,"reach":74,"imp":79,"clicks":2,"link_clicks":1,"date":"2026-07-18","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":40.09,"reach":559,"imp":643,"clicks":13,"link_clicks":12,"date":"2026-07-18","leads":0,"msgs":0,"thru":0},
+
+      // July 26-31
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":12.65,"reach":575,"imp":600,"clicks":10,"link_clicks":1,"date":"2026-07-26","leads":0,"msgs":0,"thru":39},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":15.7,"reach":658,"imp":809,"clicks":11,"link_clicks":5,"date":"2026-07-26","leads":0,"msgs":0,"thru":1},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":9.83,"reach":329,"imp":338,"clicks":3,"link_clicks":2,"date":"2026-07-26","leads":1,"msgs":0,"thru":14},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":10.75,"reach":660,"imp":708,"clicks":11,"link_clicks":8,"date":"2026-07-26","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":17.85,"reach":1006,"imp":1092,"clicks":19,"link_clicks":18,"date":"2026-07-26","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":31.45,"reach":1134,"imp":1321,"clicks":27,"link_clicks":20,"date":"2026-07-26","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":60.94,"reach":1621,"imp":1730,"clicks":22,"link_clicks":17,"date":"2026-07-26","leads":2,"msgs":0,"thru":0},
+
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":18.43,"reach":593,"imp":649,"clicks":11,"link_clicks":6,"date":"2026-07-27","leads":0,"msgs":1,"thru":31},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":21.75,"reach":825,"imp":975,"clicks":13,"link_clicks":5,"date":"2026-07-27","leads":0,"msgs":0,"thru":8},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":18.52,"reach":1171,"imp":1238,"clicks":11,"link_clicks":8,"date":"2026-07-27","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":18.83,"reach":1034,"imp":1097,"clicks":10,"link_clicks":10,"date":"2026-07-27","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":47.68,"reach":2083,"imp":2256,"clicks":25,"link_clicks":24,"date":"2026-07-27","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":62.02,"reach":1610,"imp":1711,"clicks":12,"link_clicks":9,"date":"2026-07-27","leads":1,"msgs":0,"thru":0},
+
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":20.39,"reach":418,"imp":567,"clicks":10,"link_clicks":3,"date":"2026-07-28","leads":0,"msgs":0,"thru":30},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":18.08,"reach":647,"imp":801,"clicks":12,"link_clicks":5,"date":"2026-07-28","leads":0,"msgs":0,"thru":3},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":13.32,"reach":453,"imp":487,"clicks":5,"link_clicks":5,"date":"2026-07-28","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":14.71,"reach":967,"imp":1041,"clicks":14,"link_clicks":15,"date":"2026-07-28","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":25.91,"reach":1152,"imp":1250,"clicks":19,"link_clicks":16,"date":"2026-07-28","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":46.45,"reach":1292,"imp":1412,"clicks":15,"link_clicks":13,"date":"2026-07-28","leads":0,"msgs":0,"thru":0},
+
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":8.24,"reach":199,"imp":212,"clicks":4,"link_clicks":1,"date":"2026-07-29","leads":0,"msgs":1,"thru":13},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":15.71,"reach":711,"imp":886,"clicks":14,"link_clicks":10,"date":"2026-07-29","leads":0,"msgs":1,"thru":1},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532170749269","adname":"Cannes Club Residence - 10922- v2","spend":5.28,"reach":384,"imp":390,"clicks":1,"link_clicks":1,"date":"2026-07-29","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":4.77,"reach":309,"imp":338,"clicks":4,"link_clicks":4,"date":"2026-07-29","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52538872877669","adname":"AD05","spend":4.33,"reach":316,"imp":328,"clicks":4,"link_clicks":1,"date":"2026-07-29","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":15.96,"reach":929,"imp":1014,"clicks":15,"link_clicks":12,"date":"2026-07-29","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":27.81,"reach":1236,"imp":1344,"clicks":16,"link_clicks":13,"date":"2026-07-29","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":42.61,"reach":918,"imp":1009,"clicks":7,"link_clicks":8,"date":"2026-07-29","leads":0,"msgs":0,"thru":0},
+
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":13.57,"reach":435,"imp":463,"clicks":9,"link_clicks":1,"date":"2026-07-30","leads":0,"msgs":0,"thru":30},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":9.79,"reach":498,"imp":586,"clicks":9,"link_clicks":4,"date":"2026-07-30","leads":0,"msgs":1,"thru":3},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":10.21,"reach":686,"imp":764,"clicks":6,"link_clicks":5,"date":"2026-07-30","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":11.97,"reach":665,"imp":725,"clicks":17,"link_clicks":13,"date":"2026-07-30","leads":1,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":20.5,"reach":834,"imp":901,"clicks":16,"link_clicks":11,"date":"2026-07-30","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":35.54,"reach":1157,"imp":1246,"clicks":22,"link_clicks":19,"date":"2026-07-30","leads":1,"msgs":0,"thru":0},
+
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262930265","asname":"~R$1.6 Mi","adid":"6962262928665","adname":"Video - Condomínio Vila Inglesa - 10925","spend":7.29,"reach":295,"imp":312,"clicks":7,"link_clicks":0,"date":"2026-07-31","leads":0,"msgs":0,"thru":18},
+      {"cid":"6962262927865","cname":"TRT | VENDAS | Mensagens","asid":"6962262929665","asname":"~R$950 Mil","adid":"6962262929865","adname":"Cannes Club Residence - 10922","spend":12.05,"reach":473,"imp":584,"clicks":13,"link_clicks":7,"date":"2026-07-31","leads":0,"msgs":1,"thru":1},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"6983996458465","adname":"AD06 | Terra do Sol - 10954","spend":5.22,"reach":178,"imp":179,"clicks":3,"link_clicks":2,"date":"2026-07-31","leads":0,"msgs":1,"thru":17},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925972386665","asname":"~R$950 Mil","adid":"52532172429469","adname":"Cannes Club Residence - 10922- v3","spend":6.47,"reach":445,"imp":494,"clicks":7,"link_clicks":6,"date":"2026-07-31","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6926055071465","asname":"~R$1.6 Mi","adid":"52538900784469","adname":"Condomínio Vila Inglesa - 10925 — Carrossel","spend":11.53,"reach":697,"imp":766,"clicks":4,"link_clicks":3,"date":"2026-07-31","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6925974298065","asname":"~R$579 Mil","adid":"52539184463869","adname":"Gaivotas Residence - 3244 — v3","spend":26.48,"reach":1297,"imp":1438,"clicks":20,"link_clicks":16,"date":"2026-07-31","leads":0,"msgs":0,"thru":0},
+      {"cid":"6925972386265","cname":"TRT | VENDAS | FORMS","asid":"6962794251465","asname":"~R$500 Mil","adid":"52539189757669","adname":"Enjoy AD06","spend":43.11,"reach":1063,"imp":1215,"clicks":18,"link_clicks":16,"date":"2026-07-31","leads":0,"msgs":0,"thru":0}
     ];
 
+    let chartTrendInstance = null;
     let chart1Instance = null;
     let chart2Instance = null;
 
@@ -251,7 +363,7 @@
     const fmtR = (v) => "R$ " + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtN = (v) => (v || 0).toLocaleString('pt-BR');
 
-    // INICIALIZAÇÃO
+    // INICIALIZAÇÃO DA DASHBOARD
     window.addEventListener('DOMContentLoaded', () => {
       populateDropdowns();
       setupEventListeners();
@@ -262,13 +374,12 @@
       const campSelect = document.getElementById('filter-campaign');
       const adsetSelect = document.getElementById('filter-adset');
 
-      // Unique Campaigns
       const camps = {};
       const adsets = {};
 
-      rawData.forEach(r => {
-        camps[r.campaign_id] = r.campaign_name;
-        adsets[r.adset_id] = `${r.adset_name} (${r.campaign_name})`;
+      rawDailyData.forEach(r => {
+        camps[r.cid] = r.cname;
+        adsets[r.asid] = `${r.asname} (${r.cname})`;
       });
 
       Object.keys(camps).forEach(cid => {
@@ -301,17 +412,23 @@
       updateDashboard();
     }
 
+    // FILTRO RIGOROSO POR DATA DIÁRIA (AAAA-MM-DD)
     function getFilteredData() {
-      const dStart = document.getElementById('filter-date-start').value;
-      const dEnd = document.getElementById('filter-date-end').value;
+      const dStart = document.getElementById('filter-date-start').value; // ex: "2026-07-05"
+      const dEnd = document.getElementById('filter-date-end').value;     // ex: "2026-07-15"
       const campId = document.getElementById('filter-campaign').value;
       const adsetId = document.getElementById('filter-adset').value;
 
-      return rawData.filter(r => {
-        if (dStart && r.date_start < dStart) return false;
-        if (dEnd && r.date_stop > dEnd) return false;
-        if (campId !== 'ALL' && r.campaign_id !== campId) return false;
-        if (adsetId !== 'ALL' && r.adset_id !== adsetId) return false;
+      document.getElementById('date-range-badge').textContent = `Filtro Ativo: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
+
+      return rawDailyData.filter(r => {
+        // Comparação de data string perfeita ISO (YYYY-MM-DD)
+        if (dStart && r.date < dStart) return false;
+        if (dEnd && r.date > dEnd) return false;
+
+        if (campId !== 'ALL' && r.cid !== campId) return false;
+        if (adsetId !== 'ALL' && r.asid !== adsetId) return false;
+
         return true;
       });
     }
@@ -319,29 +436,29 @@
     function updateDashboard() {
       const filtered = getFilteredData();
 
-      // Recalcular KPIs por ID
+      // Recalcular KPIs por somatório dos registros filtrados
       let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tClicks = 0, tInlineClicks = 0, tThruplays = 0;
       let spendLeadsCamp = 0, spendMsgCamp = 0;
 
       filtered.forEach(r => {
         tSpend += r.spend;
         tLeads += r.leads;
-        tConversas += r.conversas;
+        tConversas += r.msgs;
         tReach += r.reach;
-        tImpressions += r.impressions;
+        tImpressions += r.imp;
         tClicks += r.clicks;
-        tInlineClicks += r.inline_link_clicks;
-        tThruplays += r.thruplays;
+        tInlineClicks += r.link_clicks;
+        tThruplays += r.thru;
 
-        if (r.campaign_name.toLowerCase().includes('form') || r.campaign_name.toLowerCase().includes('lead')) {
+        if (r.cname.toLowerCase().includes('form') || r.cname.toLowerCase().includes('lead')) {
           spendLeadsCamp += r.spend;
         }
-        if (r.campaign_name.toLowerCase().includes('mensag') || r.campaign_name.toLowerCase().includes('whatsapp')) {
+        if (r.cname.toLowerCase().includes('mensag') || r.cname.toLowerCase().includes('whatsapp')) {
           spendMsgCamp += r.spend;
         }
       });
 
-      // Atualizar Cards KPI
+      // Atualizar interface dos Cards KPI
       document.getElementById('kpi-spend').textContent = fmtR(tSpend);
       document.getElementById('kpi-leads').textContent = fmtN(tLeads);
       document.getElementById('kpi-conversas').textContent = fmtN(tConversas);
@@ -357,7 +474,7 @@
       document.getElementById('kpi-cpmsg').textContent = cpmsg;
       document.getElementById('kpi-ctr').textContent = ctr;
 
-      // Renderizar Tabelas e Gráficos
+      // Renderizar componentes
       renderAdsetsTable(filtered);
       renderAdsTable(filtered);
       renderCharts(filtered);
@@ -367,19 +484,18 @@
       const tbody = document.getElementById('table-adsets-body');
       tbody.innerHTML = '';
 
-      // Agrupar estritamente por adset_id
       const adsetMap = {};
       data.forEach(r => {
-        if (!adsetMap[r.adset_id]) {
-          adsetMap[r.adset_id] = { id: r.adset_id, name: r.adset_name, camp: r.campaign_name, spend: 0, leads: 0, conversas: 0 };
+        if (!adsetMap[r.asid]) {
+          adsetMap[r.asid] = { id: r.asid, name: r.asname, camp: r.cname, spend: 0, leads: 0, conversas: 0 };
         }
-        adsetMap[r.adset_id].spend += r.spend;
-        adsetMap[r.adset_id].leads += r.leads;
-        adsetMap[r.adset_id].conversas += r.conversas;
+        adsetMap[r.asid].spend += r.spend;
+        adsetMap[r.asid].leads += r.leads;
+        adsetMap[r.asid].conversas += r.msgs;
       });
 
       const list = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto`;
+      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto no período`;
 
       list.forEach(a => {
         let custoTxt = "R$ 0,00";
@@ -387,7 +503,7 @@
         else if (a.conversas > 0) custoTxt = `CPMsg: ${fmtR(a.spend / a.conversas)}`;
 
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition";
+        tr.className = "hover:bg-slate-800/50 transition border-b border-slate-700/30";
         tr.innerHTML = `
           <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
           <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
@@ -405,25 +521,24 @@
       const tbody = document.getElementById('table-ads-body');
       tbody.innerHTML = '';
 
-      // Agrupar estritamente por ad_id
       const adMap = {};
       data.forEach(r => {
-        if (!adMap[r.ad_id]) {
-          adMap[r.ad_id] = { id: r.ad_id, name: r.ad_name, adset_name: r.adset_name, spend: 0, reach: 0, leads: 0, conversas: 0, clicks: 0 };
+        if (!adMap[r.adid]) {
+          adMap[r.adid] = { id: r.adid, name: r.adname, adset_name: r.asname, spend: 0, reach: 0, leads: 0, conversas: 0, clicks: 0 };
         }
-        adMap[r.ad_id].spend += r.spend;
-        adMap[r.ad_id].reach += r.reach;
-        adMap[r.ad_id].leads += r.leads;
-        adMap[r.ad_id].conversas += r.conversas;
-        adMap[r.ad_id].clicks += r.inline_link_clicks;
+        adMap[r.adid].spend += r.spend;
+        adMap[r.adid].reach += r.reach;
+        adMap[r.adid].leads += r.leads;
+        adMap[r.adid].conversas += r.msgs;
+        adMap[r.adid].clicks += r.link_clicks;
       });
 
       const list = Object.values(adMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('ads-count').textContent = `${list.length} anúncios ativos`;
+      document.getElementById('ads-count').textContent = `${list.length} anúncios com gasto no período`;
 
       list.forEach(a => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition";
+        tr.className = "hover:bg-slate-800/50 transition border-b border-slate-700/30";
         tr.innerHTML = `
           <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
           <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
@@ -439,23 +554,62 @@
     }
 
     function renderCharts(data) {
-      // Agrupamento de Campanhas para o Gráfico 1
-      const campSpendMap = {};
+      // 1. Gráfico de Evolução Diária (Linha)
+      const dailySpendMap = {};
       data.forEach(r => {
-        campSpendMap[r.campaign_name] = (campSpendMap[r.campaign_name] || 0) + r.spend;
+        const dayFormatted = r.date.split('-').slice(1).reverse().join('/'); // Ex: "01/07"
+        if (!dailySpendMap[dayFormatted]) dailySpendMap[dayFormatted] = { spend: 0, leads: 0, msgs: 0 };
+        dailySpendMap[dayFormatted].spend += r.spend;
+        dailySpendMap[dayFormatted].leads += r.leads;
+        dailySpendMap[dayFormatted].msgs += r.msgs;
       });
 
-      const c1Labels = Object.keys(campSpendMap);
-      const c1Data = Object.values(campSpendMap);
+      const trendLabels = Object.keys(dailySpendMap).sort();
+      const trendSpend = trendLabels.map(d => dailySpendMap[d].spend);
+      const trendLeads = trendLabels.map(d => dailySpendMap[d].leads);
+      const trendMsgs = trendLabels.map(d => dailySpendMap[d].msgs);
+
+      if (chartTrendInstance) chartTrendInstance.destroy();
+      const ctxTrend = document.getElementById('chartDailyTrend').getContext('2d');
+      chartTrendInstance = new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: trendLabels,
+          datasets: [
+            { label: 'Gasto Diário (R$)', data: trendSpend, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+            { label: 'Leads (Form)', data: trendLeads, borderColor: '#6366f1', backgroundColor: '#6366f1', type: 'bar', borderRadius: 4, yAxisID: 'y1' },
+            { label: 'Mensagens', data: trendMsgs, borderColor: '#38bdf8', backgroundColor: '#38bdf8', type: 'bar', borderRadius: 4, yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
+            y: { type: 'linear', display: true, position: 'left', ticks: { color: '#10b981' }, grid: { color: '#334155' } },
+            y1: { type: 'linear', display: true, position: 'right', ticks: { color: '#818cf8' }, grid: { display: false } }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 2. Gráfico Donut por Campanha
+      const campSpendMap = {};
+      data.forEach(r => {
+        campSpendMap[r.cname] = (campSpendMap[r.cname] || 0) + r.spend;
+      });
 
       if (chart1Instance) chart1Instance.destroy();
       const ctx1 = document.getElementById('chartCampaignSpend').getContext('2d');
       chart1Instance = new Chart(ctx1, {
-        type: 'doughnuts' in Chart ? 'doughnut' : 'pie',
+        type: 'doughnut',
         data: {
-          labels: c1Labels,
+          labels: Object.keys(campSpendMap),
           datasets: [{
-            data: c1Data,
+            data: Object.values(campSpendMap),
             backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'],
             borderWidth: 0
           }]
@@ -469,17 +623,15 @@
         }
       });
 
-      // Agrupamento por Conjunto/Imóvel para o Gráfico 2
+      // 3. Gráfico de Barras por Conjunto
       const adsetResultMap = {};
       data.forEach(r => {
-        if (!adsetResultMap[r.adset_name]) adsetResultMap[r.adset_name] = { leads: 0, conversas: 0 };
-        adsetResultMap[r.adset_name].leads += r.leads;
-        adsetResultMap[r.adset_name].conversas += r.conversas;
+        if (!adsetResultMap[r.asname]) adsetResultMap[r.asname] = { leads: 0, msgs: 0 };
+        adsetResultMap[r.asname].leads += r.leads;
+        adsetResultMap[r.asname].msgs += r.msgs;
       });
 
       const c2Labels = Object.keys(adsetResultMap);
-      const c2Leads = c2Labels.map(k => adsetResultMap[k].leads);
-      const c2Conversas = c2Labels.map(k => adsetResultMap[k].conversas);
 
       if (chart2Instance) chart2Instance.destroy();
       const ctx2 = document.getElementById('chartAdsetResults').getContext('2d');
@@ -488,8 +640,8 @@
         data: {
           labels: c2Labels,
           datasets: [
-            { label: 'Leads (Form)', data: c2Leads, backgroundColor: '#6366f1', borderRadius: 6 },
-            { label: 'Conversas (Msg)', data: c2Conversas, backgroundColor: '#10b981', borderRadius: 6 }
+            { label: 'Leads (Form)', data: c2Labels.map(k => adsetResultMap[k].leads), backgroundColor: '#6366f1', borderRadius: 6 },
+            { label: 'Conversas (Msg)', data: c2Labels.map(k => adsetResultMap[k].msgs), backgroundColor: '#10b981', borderRadius: 6 }
           ]
         },
         options: {
