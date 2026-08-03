@@ -130,7 +130,7 @@
       </div>
     </section>
 
-    <!-- TABELA ADAPTATIVA DE DETALHAMENTO (RK IMÓVEIS VS PADRÃO) -->
+    <!-- TABELA ADAPTATIVA DE DETALHAMENTO -->
     <section class="space-y-6" id="dynamic-tables-container">
       <!-- Injetado via JS -->
     </section>
@@ -154,7 +154,7 @@
     });
 
     // ============================================================================
-    // 1. LEITOR UNIVERSAL & PARSER REGEX CORRIGIDO
+    // 1. LEITOR DE ARQUIVO E PARSER DE LINHAS (PRECISÃO MATEMÁTICA)
     // ============================================================================
     function handleFileSelect(e) {
       const file = e.target.files[0];
@@ -204,15 +204,20 @@
 
     function parseDailyData(text) {
       const items = [];
-      // FATIADOR CORRIGIDO: Só divide quando encontra o início real de um bloco 'campaign_id:'
       const blocks = text.split(/\n(?=(?:\d+\r?\n)?campaign_id:)/);
 
       blocks.forEach(b => {
         if (!b.includes('campaign_id:')) return;
 
+        const lines = b.split('\n').map(l => l.trim());
+
         const getVal = (key) => {
-          const m = b.match(new RegExp(key + ':(.+)'));
-          return m ? m[1].trim() : '';
+          for (let l of lines) {
+            if (l.startsWith(key + ':')) {
+              return l.substring(key.length + 1).trim();
+            }
+          }
+          return '';
         };
 
         const cid = getVal('campaign_id');
@@ -228,33 +233,50 @@
         const link_clicks = parseInt(getVal('inline_link_clicks') || '0');
         const date = getVal('date_start');
 
-        // Captura de Leads
+        // LEADS (Apenas 1 por bloco diário para evitar duplicidade de lead_grouped)
         let leads = 0;
-        const leadM1 = b.match(/action_type:lead\s+value:(\d+)/);
-        const leadM2 = b.match(/action_type:onsite_conversion\.lead_grouped\s+value:(\d+)/);
-        if (leadM1) leads = parseInt(leadM1[1]);
-        else if (leadM2) leads = parseInt(leadM2[1]);
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i] === 'action_type:lead' || lines[i] === 'action_type:onsite_conversion.lead_grouped') {
+            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
+              leads = parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
+              break; 
+            }
+          }
+        }
 
-        // Captura de Mensagens
+        // MENSAGENS (Captura estrita do evento exato na linha seguinte)
         let msgs = 0;
-        const msgM1 = b.match(/action_type:onsite_conversion\.messaging_conversation_started_7d\s+value:(\d+)/);
-        const msgM2 = b.match(/indicator:actions:onsite_conversion\.messaging_conversation_started_7d[\s\S]*?value:(\d+)/);
-        if (msgM1) msgs = parseInt(msgM1[1]);
-        else if (msgM2) msgs = parseInt(msgM2[1]);
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i] === 'action_type:onsite_conversion.messaging_conversation_started_7d') {
+            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
+              msgs += parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
+            }
+          }
+        }
 
-        // Captura de E-commerce (Compras / Faturamento)
+        // E-COMMERCE (Compras e Faturamento)
         let compras = 0;
-        const compM = b.match(/action_type:purchase\s+value:(\d+)/);
-        if (compM) compras = parseInt(compM[1]);
-
         let faturamento = 0;
-        const fatM = b.match(/action_type:purchase[\s\S]*?value:([\d\.]+)/);
-        if (fatM) faturamento = parseFloat(fatM[1]);
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i] === 'action_type:purchase') {
+            if (i + 1 < lines.length && lines[i + 1].startsWith('value:')) {
+              compras += parseInt(lines[i + 1].replace('value:', '').trim()) || 0;
+            }
+          }
+        }
 
-        // Captura de ThruPlays
+        // THRUPLAYS
         let thru = 0;
-        const thruM = b.match(/video_thruplay_watched_actions[\s\S]*?value:(\d+)/);
-        if (thruM) thru = parseInt(thruM[1]);
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes('video_thruplay_watched_actions')) {
+            for (let j = i; j < Math.min(i + 5, lines.length); j++) {
+              if (lines[j].startsWith('value:')) {
+                thru = parseInt(lines[j].replace('value:', '').trim()) || 0;
+                break;
+              }
+            }
+          }
+        }
 
         if (cid && date) {
           items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, compras, faturamento, thru });
@@ -378,14 +400,14 @@
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Faturamento Total</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtR(k.tFaturamento)}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ROAS Geral</div><div class="text-lg md:text-xl font-bold text-brand-500 mt-1">${roas}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques no Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Acumulado</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
         `;
       } else {
         container.innerHTML = `
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Investimento</div><div class="text-lg md:text-xl font-bold text-white mt-1">${fmtR(k.tSpend)}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Leads (Form)</div><div class="text-lg md:text-xl font-bold text-indigo-400 mt-1">${fmtN(k.tLeads)}</div><div class="text-[10px] text-slate-400 mt-1">CPL: ${cpl}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Conversas (Msg)</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtN(k.tConversas)}</div><div class="text-[10px] text-slate-400 mt-1">CPMsg: ${cpmsg}</div></div>
-          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Total</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Acumulado</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
           <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ThruPlays</div><div class="text-lg md:text-xl font-bold text-purple-400 mt-1">${fmtN(k.tThruplays)}</div></div>
         `;
@@ -405,7 +427,6 @@
       const container = document.getElementById('dynamic-tables-container');
 
       if (clientMetadata.isRK) {
-        // TEMPLATE IMOBILIÁRIO (RK IMÓVEIS)
         const adMap = {};
         data.forEach(r => {
           if (!adMap[r.adid]) {
@@ -460,7 +481,7 @@
                     <th class="py-3 px-4">Imóvel / Anúncio + Ticket</th>
                     <th class="py-3 px-4">Campanha</th>
                     <th class="py-3 px-4 text-right">Investimento</th>
-                    <th class="py-3 px-4 text-right">Alcance</th>
+                    <th class="py-3 px-4 text-right">Alcance Acumulado</th>
                     <th class="py-3 px-4 text-right">Resultado</th>
                     <th class="py-3 px-4 text-right">Custo Un.</th>
                     <th class="py-3 px-4 text-right">Status</th>
@@ -474,7 +495,6 @@
           </div>
         `;
       } else {
-        // TEMPLATE PADRÃO / GENERAL
         const adsetMap = {};
         data.forEach(r => {
           if (!adsetMap[r.asid]) {
