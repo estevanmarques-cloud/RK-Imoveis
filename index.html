@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Meta Ads | RK Imóveis</title>
+  <title>Dashboard Meta Ads Multi-Cliente</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
@@ -24,7 +24,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-  <!-- Header Navbar -->
+  <!-- HEADER NAVBAR -->
   <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-50 px-6 py-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -32,12 +32,15 @@
           <i class="fa-solid fa-chart-line text-xl text-white"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-white tracking-wide">RK Imóveis &bull; Performance Dashboard</h1>
-          <p class="text-xs text-slate-400" id="status-txt">Aguardando carregamento de dados...</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold text-white tracking-wide" id="client-title-display">Meta Ads Dashboard</h1>
+            <span id="badge-client-type" class="hidden text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300"></span>
+          </div>
+          <p class="text-xs text-slate-400" id="status-txt">Selecione o arquivo Dados.txt para iniciar a análise</p>
         </div>
       </div>
       
-      <!-- BOTÃO PARA CARREGAR O ARQUIVO DADOS.TXT -->
+      <!-- BOTÃO UPLOAD DADOS.TXT -->
       <div class="flex items-center gap-3">
         <label class="cursor-pointer bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
           <i class="fa-solid fa-file-arrow-up text-sm"></i>
@@ -45,7 +48,7 @@
           <input type="file" id="file-input" accept=".txt,.json" class="hidden">
         </label>
         <div class="text-xs bg-slate-900/60 px-3 py-2.5 rounded-xl border border-slate-700/50 text-slate-300">
-          <span id="date-range-badge">Nenhum arquivo selecionado</span>
+          <span id="date-range-badge">Aguardando arquivo...</span>
         </div>
       </div>
     </div>
@@ -67,12 +70,12 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Início</label>
-          <input type="date" id="filter-date-start" value="2026-07-01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+          <input type="date" id="filter-date-start" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
         <div>
           <label class="block text-xs text-slate-400 mb-1">Data Fim</label>
-          <input type="date" id="filter-date-end" value="2026-07-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+          <input type="date" id="filter-date-end" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
         </div>
 
         <div>
@@ -83,7 +86,7 @@
         </div>
 
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Conjunto / Imóvel</label>
+          <label class="block text-xs text-slate-400 mb-1">Conjunto / Oferta</label>
           <select id="filter-adset" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
             <option value="ALL">Todos os Conjuntos</option>
           </select>
@@ -91,60 +94,26 @@
       </div>
     </section>
 
-    <!-- CARDS KPIs -->
-    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Investimento</div>
-        <div class="text-lg md:text-xl font-bold text-white mt-1" id="kpi-spend">R$ 0,00</div>
-        <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-wallet"></i> Total no Período</div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Leads (Form)</div>
-        <div class="text-lg md:text-xl font-bold text-indigo-400 mt-1" id="kpi-leads">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">CPL: <span id="kpi-cpl" class="text-white font-semibold">R$ 0,00</span></div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Conversas</div>
-        <div class="text-lg md:text-xl font-bold text-emerald-400 mt-1" id="kpi-conversas">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">CPMsg: <span id="kpi-cpmsg" class="text-white font-semibold">R$ 0,00</span></div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Alcance Total</div>
-        <div class="text-lg md:text-xl font-bold text-amber-400 mt-1" id="kpi-reach">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">Contas Atingidas</div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">Cliques Link</div>
-        <div class="text-lg md:text-xl font-bold text-sky-400 mt-1" id="kpi-clicks">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">CTR: <span id="kpi-ctr" class="text-white font-semibold">0%</span></div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg">
-        <div class="text-xs text-slate-400 font-medium">ThruPlays</div>
-        <div class="text-lg md:text-xl font-bold text-purple-400 mt-1" id="kpi-thruplays">0</div>
-        <div class="text-[10px] text-slate-400 mt-1">Vídeos Assistidos</div>
-      </div>
+    <!-- CONTAINER DINÂMICO DE KPIS -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" id="kpi-container">
+      <!-- Injetado Dinamicamente -->
     </section>
 
-    <!-- GRÁFICO DIÁRIO -->
+    <!-- EVOLUÇÃO DIÁRIA -->
     <section class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-chart-line text-brand-500"></i> Evolução Diária do Investimento e Resultados
+        <i class="fa-solid fa-chart-line text-brand-500"></i> Evolução Diária de Desempenho
       </h3>
       <div class="h-64">
         <canvas id="chartDailyTrend"></canvas>
       </div>
     </section>
 
-    <!-- GRÁFICOS COMPARATIVOS -->
+    <!-- GRÁFICOS VISUAIS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-brand-500"></i> Investimento por Campanha
+          <i class="fa-solid fa-chart-pie text-brand-500"></i> Divisão de Gasto por Campanha
         </h3>
         <div class="h-64">
           <canvas id="chartCampaignSpend"></canvas>
@@ -161,66 +130,17 @@
       </div>
     </section>
 
-    <!-- TABELAS -->
-    <section class="space-y-6">
-      <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
-        <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-building text-brand-500"></i> Desempenho por Imóvel / Conjunto
-          </h3>
-          <span class="text-xs text-slate-400" id="adsets-count">0 registros</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
-              <tr>
-                <th class="py-3 px-4">AdSet ID</th>
-                <th class="py-3 px-4">Nome do Conjunto</th>
-                <th class="py-3 px-4">Campanha</th>
-                <th class="py-3 px-4 text-right">Investimento</th>
-                <th class="py-3 px-4 text-right">Leads</th>
-                <th class="py-3 px-4 text-right">Conversas</th>
-                <th class="py-3 px-4 text-right">CPL / CPMsg</th>
-              </tr>
-            </thead>
-            <tbody id="table-adsets-body" class="divide-y divide-slate-700/50 text-slate-300">
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
-        <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-rectangle-ad text-indigo-400"></i> Top Anúncios / Criativos
-          </h3>
-          <span class="text-xs text-slate-400" id="ads-count">0 registros</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
-              <tr>
-                <th class="py-3 px-4">Ad ID</th>
-                <th class="py-3 px-4">Nome do Anúncio</th>
-                <th class="py-3 px-4">Conjunto</th>
-                <th class="py-3 px-4 text-right">Gasto</th>
-                <th class="py-3 px-4 text-right">Alcance</th>
-                <th class="py-3 px-4 text-right">Leads</th>
-                <th class="py-3 px-4 text-right">Mensagens</th>
-                <th class="py-3 px-4 text-right">Cliques Link</th>
-              </tr>
-            </thead>
-            <tbody id="table-ads-body" class="divide-y divide-slate-700/50 text-slate-300">
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- VISÃO ADAPTATIVA DE DETALHAMENTO (RK vs PADRÃO) -->
+    <section class="space-y-6" id="dynamic-tables-container">
+      <!-- Injetado Dinamicamente -->
     </section>
 
   </main>
 
   <script>
-    let rawDailyData = [];
+    let rawData = [];
+    let clientMetadata = { name: "Cliente Desconhecido", rank: "", sec: "", isRK: false };
+
     let chartTrendInstance = null;
     let chart1Instance = null;
     let chart2Instance = null;
@@ -233,7 +153,9 @@
       setupEventListeners();
     });
 
-    // PARSER INTELIGENTE DO ARQUIVO DADOS.TXT
+    // ============================================================================
+    // 1. PARSER INTELIGENTE DO DADOS.TXT + RECONHECIMENTO DE REGRAS DE NEGÓCIO
+    // ============================================================================
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -241,16 +163,47 @@
       const reader = new FileReader();
       reader.onload = function(evt) {
         const text = evt.target.result;
-        rawDailyData = parseDadosText(text);
+        parseHeaderMetadata(text);
+        rawData = parseDailyData(text);
         
-        document.getElementById('status-txt').textContent = `Carregados ${rawDailyData.length} registros com sucesso!`;
+        document.getElementById('status-txt').textContent = `Cliente: ${clientMetadata.name} | ${rawData.length} registros processados por ID`;
+        document.getElementById('client-title-display').textContent = clientMetadata.name;
+        
+        const badge = document.getElementById('badge-client-type');
+        badge.classList.remove('hidden');
+        if(clientMetadata.isRK) {
+          badge.textContent = "Template RK Imóveis";
+          badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        } else {
+          badge.textContent = "Template Padrão / E-commerce";
+          badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30";
+        }
+
         populateDropdowns();
         updateDashboard();
       };
       reader.readAsText(file);
     }
 
-    function parseDadosText(text) {
+    function parseHeaderMetadata(text) {
+      // Busca nome do cliente
+      const mClient = text.match(/(?:Cliente|cliente)\r?\n([^\r\n]+)/);
+      const mRank = text.match(/Metrica Rank Anuncio\r?\n([^\r\n]+)/);
+      const mSec = text.match(/Metricas Secundarias\r?\n([^\r\n]+)/);
+
+      const clientName = mClient ? mClient[1].trim() : "Cliente Desconhecido";
+      const metricaRank = mRank ? mRank[1].trim().toLowerCase() : "";
+      const metricasSec = mSec ? mSec[1].trim().toLowerCase() : "";
+
+      clientMetadata = {
+        name: clientName,
+        rank: metricaRank,
+        sec: metricasSec,
+        isRK: clientName.toUpperCase().includes("RK")
+      };
+    }
+
+    function parseDailyData(text) {
       const items = [];
       const blocks = text.split(/\n(?=\d+\r?\n)/);
 
@@ -275,26 +228,35 @@
         const link_clicks = parseInt(getVal('inline_link_clicks') || '0');
         const date = getVal('date_start');
 
-        // Extração de Leads
+        // Leads
         let leads = 0;
-        const leadMatch1 = b.match(/action_type:lead\s+value:(\d+)/);
-        const leadMatch2 = b.match(/action_type:onsite_conversion\.lead_grouped\s+value:(\d+)/);
-        if (leadMatch1) leads = parseInt(leadMatch1[1]);
-        else if (leadMatch2) leads = parseInt(leadMatch2[1]);
+        const leadM1 = b.match(/action_type:lead\s+value:(\d+)/);
+        const leadM2 = b.match(/action_type:onsite_conversion\.lead_grouped\s+value:(\d+)/);
+        if (leadM1) leads = parseInt(leadM1[1]);
+        else if (leadM2) leads = parseInt(leadM2[1]);
 
-        // Extração de Mensagens
+        // Mensagens
         let msgs = 0;
-        const msgMatch = b.match(/action_type:onsite_conversion\.messaging_conversation_started_7d\s+value:(\d+)/);
-        const indicatorMatch = b.match(/indicator:actions:onsite_conversion\.messaging_conversation_started_7d[\s\S]*?value:(\d+)/);
-        if (msgMatch) msgs = parseInt(msgMatch[1]);
-        else if (indicatorMatch) msgs = parseInt(indicatorMatch[1]);
+        const msgM1 = b.match(/action_type:onsite_conversion\.messaging_conversation_started_7d\s+value:(\d+)/);
+        const msgM2 = b.match(/indicator:actions:onsite_conversion\.messaging_conversation_started_7d[\s\S]*?value:(\d+)/);
+        if (msgM1) msgs = parseInt(msgM1[1]);
+        else if (msgM2) msgs = parseInt(msgM2[1]);
 
-        // Extração de Thruplays
+        // Compras e Faturamento (E-commerce)
+        let compras = 0;
+        const compM = b.match(/action_type:purchase\s+value:(\d+)/);
+        if (compM) compras = parseInt(compM[1]);
+
+        let faturamento = 0;
+        const fatM = b.match(/action_type:purchase[\s\S]*?value:([\d\.]+)/);
+        if (fatM) faturamento = parseFloat(fatM[1]);
+
+        // Thruplays
         let thru = 0;
-        const thruMatch = b.match(/video_thruplay_watched_actions[\s\S]*?value:(\d+)/);
-        if (thruMatch) thru = parseInt(thruMatch[1]);
+        const thruM = b.match(/video_thruplay_watched_actions[\s\S]*?value:(\d+)/);
+        if (thruM) thru = parseInt(thruM[1]);
 
-        items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, thru });
+        items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, compras, faturamento, thru });
       });
 
       return items;
@@ -307,25 +269,31 @@
       campSelect.innerHTML = '<option value="ALL">Todas as Campanhas</option>';
       adsetSelect.innerHTML = '<option value="ALL">Todos os Conjuntos</option>';
 
-      const camps = {};
-      const adsets = {};
+      const camps = {}, adsets = {}, dates = [];
 
-      rawDailyData.forEach(r => {
+      rawData.forEach(r => {
         camps[r.cid] = r.cname;
         adsets[r.asid] = `${r.asname} (${r.cname})`;
+        if(!dates.includes(r.date)) dates.push(r.date);
       });
+
+      dates.sort();
+      if(dates.length > 0) {
+        document.getElementById('filter-date-start').value = dates[0];
+        document.getElementById('filter-date-end').value = dates[dates.length - 1];
+        document.getElementById('filter-date-start').min = dates[0];
+        document.getElementById('filter-date-end').max = dates[dates.length - 1];
+      }
 
       Object.keys(camps).forEach(cid => {
         const opt = document.createElement('option');
-        opt.value = cid;
-        opt.textContent = camps[cid];
+        opt.value = cid; opt.textContent = camps[cid];
         campSelect.appendChild(opt);
       });
 
       Object.keys(adsets).forEach(aid => {
         const opt = document.createElement('option');
-        opt.value = aid;
-        opt.textContent = adsets[aid];
+        opt.value = aid; opt.textContent = adsets[aid];
         adsetSelect.appendChild(opt);
       });
     }
@@ -338,10 +306,7 @@
     }
 
     function resetFilters() {
-      document.getElementById('filter-date-start').value = '2026-07-01';
-      document.getElementById('filter-date-end').value = '2026-07-31';
-      document.getElementById('filter-campaign').value = 'ALL';
-      document.getElementById('filter-adset').value = 'ALL';
+      populateDropdowns();
       updateDashboard();
     }
 
@@ -351,23 +316,27 @@
       const campId = document.getElementById('filter-campaign').value;
       const adsetId = document.getElementById('filter-adset').value;
 
-      document.getElementById('date-range-badge').textContent = `Filtro: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
+      if(dStart && dEnd) {
+        document.getElementById('date-range-badge').textContent = `Filtro: ${dStart.split('-').reverse().join('/')} a ${dEnd.split('-').reverse().join('/')}`;
+      }
 
-      return rawDailyData.filter(r => {
+      return rawData.filter(r => {
         if (dStart && r.date < dStart) return false;
         if (dEnd && r.date > dEnd) return false;
-
         if (campId !== 'ALL' && r.cid !== campId) return false;
         if (adsetId !== 'ALL' && r.asid !== adsetId) return false;
-
         return true;
       });
     }
 
+    // ============================================================================
+    // 2. ATUALIZAÇÃO REATIVA DO DASHBOARD (RENDERIZADOR ADAPTATIVO)
+    // ============================================================================
     function updateDashboard() {
       const filtered = getFilteredData();
 
-      let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tClicks = 0, tInlineClicks = 0, tThruplays = 0;
+      // Recalcular KPIs por ID
+      let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tInlineClicks = 0, tThruplays = 0, tCompras = 0, tFaturamento = 0;
       let spendLeadsCamp = 0, spendMsgCamp = 0;
 
       filtered.forEach(r => {
@@ -376,112 +345,207 @@
         tConversas += r.msgs;
         tReach += r.reach;
         tImpressions += r.imp;
-        tClicks += r.clicks;
         tInlineClicks += r.link_clicks;
         tThruplays += r.thru;
+        tCompras += r.compras;
+        tFaturamento += r.faturamento;
 
-        if (r.cname.toLowerCase().includes('form') || r.cname.toLowerCase().includes('lead')) {
-          spendLeadsCamp += r.spend;
-        }
-        if (r.cname.toLowerCase().includes('mensag') || r.cname.toLowerCase().includes('whatsapp')) {
-          spendMsgCamp += r.spend;
-        }
+        if (r.cname.toLowerCase().includes('form') || r.cname.toLowerCase().includes('lead')) spendLeadsCamp += r.spend;
+        if (r.cname.toLowerCase().includes('mensag') || r.cname.toLowerCase().includes('whatsapp')) spendMsgCamp += r.spend;
       });
 
-      document.getElementById('kpi-spend').textContent = fmtR(tSpend);
-      document.getElementById('kpi-leads').textContent = fmtN(tLeads);
-      document.getElementById('kpi-conversas').textContent = fmtN(tConversas);
-      document.getElementById('kpi-reach').textContent = fmtN(tReach);
-      document.getElementById('kpi-clicks').textContent = fmtN(tInlineClicks);
-      document.getElementById('kpi-thruplays').textContent = fmtN(tThruplays);
-
-      const cpl = tLeads > 0 ? fmtR(spendLeadsCamp / tLeads) : "R$ 0,00";
-      const cpmsg = tConversas > 0 ? fmtR((spendMsgCamp > 0 ? spendMsgCamp : tSpend) / tConversas) : "R$ 0,00";
-      const ctr = tImpressions > 0 ? ((tInlineClicks / tImpressions) * 100).toFixed(2) + "%" : "0%";
-
-      document.getElementById('kpi-cpl').textContent = cpl;
-      document.getElementById('kpi-cpmsg').textContent = cpmsg;
-      document.getElementById('kpi-ctr').textContent = ctr;
-
-      renderAdsetsTable(filtered);
-      renderAdsTable(filtered);
+      renderKPIs({ tSpend, tLeads, tConversas, tReach, tImpressions, tInlineClicks, tThruplays, tCompras, tFaturamento, spendLeadsCamp, spendMsgCamp });
+      renderDynamicTables(filtered);
       renderCharts(filtered);
     }
 
-    function renderAdsetsTable(data) {
-      const tbody = document.getElementById('table-adsets-body');
-      tbody.innerHTML = '';
+    function renderKPIs(k) {
+      const container = document.getElementById('kpi-container');
+      const isEcommerce = clientMetadata.rank.includes("compras") || clientMetadata.rank.includes("vendas") || k.tCompras > 0;
 
-      const adsetMap = {};
-      data.forEach(r => {
-        if (!adsetMap[r.asid]) {
-          adsetMap[r.asid] = { id: r.asid, name: r.asname, camp: r.cname, spend: 0, leads: 0, conversas: 0 };
-        }
-        adsetMap[r.asid].spend += r.spend;
-        adsetMap[r.asid].leads += r.leads;
-        adsetMap[r.asid].conversas += r.msgs;
-      });
+      const cpl = k.tLeads > 0 ? fmtR(k.spendLeadsCamp / k.tLeads) : "R$ 0,00";
+      const cpmsg = k.tConversas > 0 ? fmtR((k.spendMsgCamp > 0 ? k.spendMsgCamp : k.tSpend) / k.tConversas) : "R$ 0,00";
+      const ctr = k.tImpressions > 0 ? ((k.tInlineClicks / k.tImpressions) * 100).toFixed(2) + "%" : "0%";
 
-      const list = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('adsets-count').textContent = `${list.length} conjuntos com gasto`;
+      if(isEcommerce) {
+        const roas = k.tSpend > 0 ? (k.tFaturamento / k.tSpend).toFixed(2).replace('.', ',') : '0,00';
+        const cpa = k.tCompras > 0 ? fmtR(k.tSpend / k.tCompras) : "R$ 0,00";
 
-      list.forEach(a => {
-        let custoTxt = "R$ 0,00";
-        if (a.leads > 0) custoTxt = `CPL: ${fmtR(a.spend / a.leads)}`;
-        else if (a.conversas > 0) custoTxt = `CPMsg: ${fmtR(a.spend / a.conversas)}`;
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition border-b border-slate-700/30";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
-          <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
-          <td class="py-3 px-4 text-slate-400">${a.camp}</td>
-          <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
-          <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
-          <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
-          <td class="py-3 px-4 text-right text-slate-300">${custoTxt}</td>
+        container.innerHTML = `
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Investimento</div><div class="text-lg md:text-xl font-bold text-white mt-1">${fmtR(k.tSpend)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Compras no Site</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtN(k.tCompras)}</div><div class="text-[10px] text-slate-400 mt-1">CPA: ${cpa}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Faturamento Total</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtR(k.tFaturamento)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ROAS Geral</div><div class="text-lg md:text-xl font-bold text-brand-500 mt-1">${roas}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques no Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
         `;
-        tbody.appendChild(tr);
-      });
+      } else {
+        container.innerHTML = `
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Investimento</div><div class="text-lg md:text-xl font-bold text-white mt-1">${fmtR(k.tSpend)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Leads (Form)</div><div class="text-lg md:text-xl font-bold text-indigo-400 mt-1">${fmtN(k.tLeads)}</div><div class="text-[10px] text-slate-400 mt-1">CPL: ${cpl}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Conversas (Msg)</div><div class="text-lg md:text-xl font-bold text-emerald-400 mt-1">${fmtN(k.tConversas)}</div><div class="text-[10px] text-slate-400 mt-1">CPMsg: ${cpmsg}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Alcance Total</div><div class="text-lg md:text-xl font-bold text-amber-400 mt-1">${fmtN(k.tReach)}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">Cliques Link</div><div class="text-lg md:text-xl font-bold text-sky-400 mt-1">${fmtN(k.tInlineClicks)}</div><div class="text-[10px] text-slate-400 mt-1">CTR: ${ctr}</div></div>
+          <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl shadow-lg"><div class="text-xs text-slate-400 font-medium">ThruPlays</div><div class="text-lg md:text-xl font-bold text-purple-400 mt-1">${fmtN(k.tThruplays)}</div></div>
+        `;
+      }
     }
 
-    function renderAdsTable(data) {
-      const tbody = document.getElementById('table-ads-body');
-      tbody.innerHTML = '';
+    // EXTRAI PREÇO DO ADSET (EX: "~R$ 500 Mil" -> "~500k")
+    function formatAdsetPrice(adsetName) {
+      if (!adsetName || !adsetName.includes("~")) return "";
+      let match = adsetName.match(/~.*?$/);
+      if (match) {
+        return " " + match[0].replace(/R\$/gi, '').replace(/ Mil/gi, 'k').replace(/ Mi/gi, 'M').replace(/\s+/g, '').trim();
+      }
+      return "";
+    }
 
-      const adMap = {};
-      data.forEach(r => {
-        if (!adMap[r.adid]) {
-          adMap[r.adid] = { id: r.adid, name: r.adname, adset_name: r.asname, spend: 0, reach: 0, leads: 0, conversas: 0, clicks: 0 };
-        }
-        adMap[r.adid].spend += r.spend;
-        adMap[r.adid].reach += r.reach;
-        adMap[r.adid].leads += r.leads;
-        adMap[r.adid].conversas += r.msgs;
-        adMap[r.adid].clicks += r.link_clicks;
-      });
+    function renderDynamicTables(data) {
+      const container = document.getElementById('dynamic-tables-container');
 
-      const list = Object.values(adMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
-      document.getElementById('ads-count').textContent = `${list.length} anúncios ativos`;
+      if (clientMetadata.isRK) {
+        // ============================================================================
+        // TEMPLATE EXCLUSIVO RK IMÓVEIS (AGRUPADO POR IMÓVEL / OFERTA)
+        // ============================================================================
+        const adMap = {};
+        data.forEach(r => {
+          if (!adMap[r.adid]) {
+            adMap[r.adid] = {
+              id: r.adid, name: r.adname, adsetName: r.asname, campName: r.cname,
+              spend: 0, reach: 0, leads: 0, msgs: 0
+            };
+          }
+          adMap[r.adid].spend += r.spend;
+          adMap[r.adid].reach += r.reach;
+          adMap[r.adid].leads += r.leads;
+          adMap[r.adid].msgs += r.msgs;
+        });
 
-      list.forEach(a => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/50 transition border-b border-slate-700/30";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
-          <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
-          <td class="py-3 px-4 text-slate-400">${a.adset_name}</td>
-          <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
-          <td class="py-3 px-4 text-right text-slate-300">${fmtN(a.reach)}</td>
-          <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
-          <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
-          <td class="py-3 px-4 text-right text-sky-400">${fmtN(a.clicks)}</td>
+        const listRK = Object.values(adMap).filter(a => a.spend > 0).sort((a, b) => b.spend - a.spend);
+
+        let rowsHTML = "";
+        listRK.forEach(ad => {
+          const isMsg = ad.campName.toLowerCase().includes("mensag") || ad.campName.toLowerCase().includes("whatsapp");
+          const label = isMsg ? "Mensagens" : "Leads";
+          const val = isMsg ? ad.msgs : ad.leads;
+          const custoLabel = isMsg ? "CPMsg" : "CPL";
+          const cpl = val > 0 ? fmtR(ad.spend / val) : "R$ 0,00";
+          const priceTag = formatAdsetPrice(ad.adsetName);
+          const nomeFinal = `${ad.name}<span class="text-emerald-400 font-bold ml-1">${priceTag}</span>`;
+
+          rowsHTML += `
+            <tr class="hover:bg-slate-800/50 transition border-b border-slate-700/30">
+              <td class="py-3 px-4 font-semibold text-white">${nomeFinal}</td>
+              <td class="py-3 px-4 text-slate-400 text-xs">${ad.campName}</td>
+              <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(ad.spend)}</td>
+              <td class="py-3 px-4 text-right text-slate-300">${fmtN(ad.reach)}</td>
+              <td class="py-3 px-4 text-right font-bold text-indigo-400">${label}: ${val}</td>
+              <td class="py-3 px-4 text-right text-slate-300">${custoLabel}: ${cpl}</td>
+              <td class="py-3 px-4 text-right text-slate-500 font-mono text-[10px]">MQL: -</td>
+            </tr>
+          `;
+        });
+
+        container.innerHTML = `
+          <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-house-circle-check text-emerald-400"></i> Desempenho por Imóvel / Criativo (Modelo RK)
+              </h3>
+              <span class="text-xs text-slate-400">${listRK.length} imóveis ativos</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-4">Imóvel / Anúncio + Ticket</th>
+                    <th class="py-3 px-4">Campanha</th>
+                    <th class="py-3 px-4 text-right">Investimento</th>
+                    <th class="py-3 px-4 text-right">Contas Atingidas</th>
+                    <th class="py-3 px-4 text-right">Resultado</th>
+                    <th class="py-3 px-4 text-right">Custo Un.</th>
+                    <th class="py-3 px-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50 text-slate-300">
+                  ${rowsHTML}
+                </tbody>
+              </table>
+            </div>
+          </div>
         `;
-        tbody.appendChild(tr);
-      });
+      } else {
+        // ============================================================================
+        // TEMPLATE PADRÃO / E-COMMERCE (COM RANKING DE TOP CRIATIVOS)
+        // ============================================================================
+        const adsetMap = {};
+        data.forEach(r => {
+          if (!adsetMap[r.asid]) {
+            adsetMap[r.asid] = { id: r.asid, name: r.asname, camp: r.cname, spend: 0, leads: 0, conversas: 0, compras: 0, faturamento: 0 };
+          }
+          adsetMap[r.asid].spend += r.spend;
+          adsetMap[r.asid].leads += r.leads;
+          adsetMap[r.asid].conversas += r.msgs;
+          adsetMap[r.asid].compras += r.compras;
+          adsetMap[r.asid].faturamento += r.faturamento;
+        });
+
+        const listAdsets = Object.values(adsetMap).filter(a => a.spend > 0).sort((a,b) => b.spend - a.spend);
+
+        let adsetsHTML = "";
+        listAdsets.forEach(a => {
+          let custoTxt = "R$ 0,00";
+          if (a.leads > 0) custoTxt = `CPL: ${fmtR(a.spend / a.leads)}`;
+          else if (a.conversas > 0) custoTxt = `CPMsg: ${fmtR(a.spend / a.conversas)}`;
+          else if (a.compras > 0) custoTxt = `CPA: ${fmtR(a.spend / a.compras)}`;
+
+          adsetsHTML += `
+            <tr class="hover:bg-slate-800/50 transition border-b border-slate-700/30">
+              <td class="py-3 px-4 font-mono text-[11px] text-slate-400">${a.id}</td>
+              <td class="py-3 px-4 font-semibold text-white">${a.name}</td>
+              <td class="py-3 px-4 text-slate-400">${a.camp}</td>
+              <td class="py-3 px-4 text-right font-medium text-emerald-400">${fmtR(a.spend)}</td>
+              <td class="py-3 px-4 text-right font-bold text-indigo-400">${fmtN(a.leads)}</td>
+              <td class="py-3 px-4 text-right font-bold text-emerald-400">${fmtN(a.conversas)}</td>
+              <td class="py-3 px-4 text-right text-slate-300">${custoTxt}</td>
+            </tr>
+          `;
+        });
+
+        container.innerHTML = `
+          <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-5 border-b border-slate-700/60 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-building text-brand-500"></i> Desempenho por Conjunto
+              </h3>
+              <span class="text-xs text-slate-400">${listAdsets.length} conjuntos</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-4">AdSet ID</th>
+                    <th class="py-3 px-4">Nome do Conjunto</th>
+                    <th class="py-3 px-4">Campanha</th>
+                    <th class="py-3 px-4 text-right">Investimento</th>
+                    <th class="py-3 px-4 text-right">Leads</th>
+                    <th class="py-3 px-4 text-right">Conversas</th>
+                    <th class="py-3 px-4 text-right">Custo / Resultado</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50 text-slate-300">
+                  ${adsetsHTML}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
     }
 
     function renderCharts(data) {
+      // 1. Gráfico de Evolução Diária
       const dailyMap = {};
       data.forEach(r => {
         const dFmt = r.date.split('-').slice(1).reverse().join('/');
@@ -522,6 +586,7 @@
         }
       });
 
+      // 2. Gráfico Donut de Campanhas
       const campSpendMap = {};
       data.forEach(r => {
         campSpendMap[r.cname] = (campSpendMap[r.cname] || 0) + r.spend;
@@ -548,6 +613,7 @@
         }
       });
 
+      // 3. Gráfico de Barras por Conjunto
       const adsetResultMap = {};
       data.forEach(r => {
         if (!adsetResultMap[r.asname]) adsetResultMap[r.asname] = { leads: 0, msgs: 0 };
