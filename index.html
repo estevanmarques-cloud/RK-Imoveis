@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Meta Ads Multi-Cliente</title>
+  <title>Dashboard Meta Ads Dinâmico Multi-Cliente</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
@@ -24,7 +24,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-  <!-- HEADER NAVBAR -->
+  <!-- HEADER / NAVBAR -->
   <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-50 px-6 py-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -36,7 +36,7 @@
             <h1 class="text-xl font-bold text-white tracking-wide" id="client-title-display">Meta Ads Dashboard</h1>
             <span id="badge-client-type" class="hidden text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300"></span>
           </div>
-          <p class="text-xs text-slate-400" id="status-txt">Selecione o arquivo Dados.txt para iniciar a análise</p>
+          <p class="text-xs text-slate-400" id="status-txt">Selecione o arquivo Dados.txt para carregar os dados</p>
         </div>
       </div>
       
@@ -56,7 +56,7 @@
 
   <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-6">
 
-    <!-- SEÇÃO DE FILTROS -->
+    <!-- SEÇÃO DE FILTROS INTERATIVOS -->
     <section class="bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
@@ -94,9 +94,9 @@
       </div>
     </section>
 
-    <!-- CONTAINER DINÂMICO DE KPIS -->
+    <!-- CARDS DE KPIS DINÂMICOS -->
     <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" id="kpi-container">
-      <!-- Injetado Dinamicamente -->
+      <!-- Injetado via JS -->
     </section>
 
     <!-- EVOLUÇÃO DIÁRIA -->
@@ -109,7 +109,7 @@
       </div>
     </section>
 
-    <!-- GRÁFICOS VISUAIS -->
+    <!-- GRÁFICOS VISUAIS DE DIVISÃO E RESULTADOS -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl shadow-xl">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
@@ -130,16 +130,16 @@
       </div>
     </section>
 
-    <!-- VISÃO ADAPTATIVA DE DETALHAMENTO (RK vs PADRÃO) -->
+    <!-- TABELA ADAPTATIVA DE DETALHAMENTO (RK IMÓVEIS VS PADRÃO) -->
     <section class="space-y-6" id="dynamic-tables-container">
-      <!-- Injetado Dinamicamente -->
+      <!-- Injetado via JS -->
     </section>
 
   </main>
 
   <script>
     let rawData = [];
-    let clientMetadata = { name: "Cliente Desconhecido", rank: "", sec: "", isRK: false };
+    let clientMetadata = { name: "Cliente Meta Ads", rank: "", sec: "", isRK: false };
 
     let chartTrendInstance = null;
     let chart1Instance = null;
@@ -154,7 +154,7 @@
     });
 
     // ============================================================================
-    // 1. PARSER INTELIGENTE DO DADOS.TXT + RECONHECIMENTO DE REGRAS DE NEGÓCIO
+    // 1. LEITOR UNIVERSAL & PARSER REGEX CORRIGIDO
     // ============================================================================
     function handleFileSelect(e) {
       const file = e.target.files[0];
@@ -186,12 +186,11 @@
     }
 
     function parseHeaderMetadata(text) {
-      // Busca nome do cliente
       const mClient = text.match(/(?:Cliente|cliente)\r?\n([^\r\n]+)/);
       const mRank = text.match(/Metrica Rank Anuncio\r?\n([^\r\n]+)/);
       const mSec = text.match(/Metricas Secundarias\r?\n([^\r\n]+)/);
 
-      const clientName = mClient ? mClient[1].trim() : "Cliente Desconhecido";
+      const clientName = mClient ? mClient[1].trim() : "Cliente Meta Ads";
       const metricaRank = mRank ? mRank[1].trim().toLowerCase() : "";
       const metricasSec = mSec ? mSec[1].trim().toLowerCase() : "";
 
@@ -205,7 +204,8 @@
 
     function parseDailyData(text) {
       const items = [];
-      const blocks = text.split(/\n(?=\d+\r?\n)/);
+      // FATIADOR CORRIGIDO: Só divide quando encontra o início real de um bloco 'campaign_id:'
+      const blocks = text.split(/\n(?=(?:\d+\r?\n)?campaign_id:)/);
 
       blocks.forEach(b => {
         if (!b.includes('campaign_id:')) return;
@@ -228,21 +228,21 @@
         const link_clicks = parseInt(getVal('inline_link_clicks') || '0');
         const date = getVal('date_start');
 
-        // Leads
+        // Captura de Leads
         let leads = 0;
         const leadM1 = b.match(/action_type:lead\s+value:(\d+)/);
         const leadM2 = b.match(/action_type:onsite_conversion\.lead_grouped\s+value:(\d+)/);
         if (leadM1) leads = parseInt(leadM1[1]);
         else if (leadM2) leads = parseInt(leadM2[1]);
 
-        // Mensagens
+        // Captura de Mensagens
         let msgs = 0;
         const msgM1 = b.match(/action_type:onsite_conversion\.messaging_conversation_started_7d\s+value:(\d+)/);
         const msgM2 = b.match(/indicator:actions:onsite_conversion\.messaging_conversation_started_7d[\s\S]*?value:(\d+)/);
         if (msgM1) msgs = parseInt(msgM1[1]);
         else if (msgM2) msgs = parseInt(msgM2[1]);
 
-        // Compras e Faturamento (E-commerce)
+        // Captura de E-commerce (Compras / Faturamento)
         let compras = 0;
         const compM = b.match(/action_type:purchase\s+value:(\d+)/);
         if (compM) compras = parseInt(compM[1]);
@@ -251,12 +251,14 @@
         const fatM = b.match(/action_type:purchase[\s\S]*?value:([\d\.]+)/);
         if (fatM) faturamento = parseFloat(fatM[1]);
 
-        // Thruplays
+        // Captura de ThruPlays
         let thru = 0;
         const thruM = b.match(/video_thruplay_watched_actions[\s\S]*?value:(\d+)/);
         if (thruM) thru = parseInt(thruM[1]);
 
-        items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, compras, faturamento, thru });
+        if (cid && date) {
+          items.push({ cid, cname, asid, asname, adid, adname, spend, reach, imp, clicks, link_clicks, date, leads, msgs, compras, faturamento, thru });
+        }
       });
 
       return items;
@@ -330,12 +332,11 @@
     }
 
     // ============================================================================
-    // 2. ATUALIZAÇÃO REATIVA DO DASHBOARD (RENDERIZADOR ADAPTATIVO)
+    // 2. RECALCULO E RENDERIZAÇÃO REATIVA
     // ============================================================================
     function updateDashboard() {
       const filtered = getFilteredData();
 
-      // Recalcular KPIs por ID
       let tSpend = 0, tLeads = 0, tConversas = 0, tReach = 0, tImpressions = 0, tInlineClicks = 0, tThruplays = 0, tCompras = 0, tFaturamento = 0;
       let spendLeadsCamp = 0, spendMsgCamp = 0;
 
@@ -391,7 +392,6 @@
       }
     }
 
-    // EXTRAI PREÇO DO ADSET (EX: "~R$ 500 Mil" -> "~500k")
     function formatAdsetPrice(adsetName) {
       if (!adsetName || !adsetName.includes("~")) return "";
       let match = adsetName.match(/~.*?$/);
@@ -405,9 +405,7 @@
       const container = document.getElementById('dynamic-tables-container');
 
       if (clientMetadata.isRK) {
-        // ============================================================================
-        // TEMPLATE EXCLUSIVO RK IMÓVEIS (AGRUPADO POR IMÓVEL / OFERTA)
-        // ============================================================================
+        // TEMPLATE IMOBILIÁRIO (RK IMÓVEIS)
         const adMap = {};
         data.forEach(r => {
           if (!adMap[r.adid]) {
@@ -462,7 +460,7 @@
                     <th class="py-3 px-4">Imóvel / Anúncio + Ticket</th>
                     <th class="py-3 px-4">Campanha</th>
                     <th class="py-3 px-4 text-right">Investimento</th>
-                    <th class="py-3 px-4 text-right">Contas Atingidas</th>
+                    <th class="py-3 px-4 text-right">Alcance</th>
                     <th class="py-3 px-4 text-right">Resultado</th>
                     <th class="py-3 px-4 text-right">Custo Un.</th>
                     <th class="py-3 px-4 text-right">Status</th>
@@ -476,9 +474,7 @@
           </div>
         `;
       } else {
-        // ============================================================================
-        // TEMPLATE PADRÃO / E-COMMERCE (COM RANKING DE TOP CRIATIVOS)
-        // ============================================================================
+        // TEMPLATE PADRÃO / GENERAL
         const adsetMap = {};
         data.forEach(r => {
           if (!adsetMap[r.asid]) {
@@ -545,7 +541,7 @@
     }
 
     function renderCharts(data) {
-      // 1. Gráfico de Evolução Diária
+      // 1. Gráfico Diário
       const dailyMap = {};
       data.forEach(r => {
         const dFmt = r.date.split('-').slice(1).reverse().join('/');
@@ -586,7 +582,7 @@
         }
       });
 
-      // 2. Gráfico Donut de Campanhas
+      // 2. Donut Campanhas
       const campSpendMap = {};
       data.forEach(r => {
         campSpendMap[r.cname] = (campSpendMap[r.cname] || 0) + r.spend;
@@ -613,7 +609,7 @@
         }
       });
 
-      // 3. Gráfico de Barras por Conjunto
+      // 3. Barras Resultados Conjuntos
       const adsetResultMap = {};
       data.forEach(r => {
         if (!adsetResultMap[r.asname]) adsetResultMap[r.asname] = { leads: 0, msgs: 0 };
