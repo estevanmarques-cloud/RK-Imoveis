@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Ads BI - Advanced Local Engine</title>
     
-    <!-- Dependências Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Configuração do Tailwind (Linear / Vercel Vibe) -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -41,53 +39,31 @@
 </head>
 <body class="min-h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- Sidebar Layout Placeholder (Será preenchido pelo Renderer) -->
     <aside id="sidebar-container" class="w-full md:w-64 glass-panel border-r border-border-dark flex-shrink-0 flex flex-col"></aside>
     
-    <!-- Main Content Layout -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header id="topbar-container" class="h-16 glass-panel border-b border-border-dark flex items-center justify-between px-6 shrink-0">
-            <!-- Será preenchido dinamicamente -->
-        </header>
+        <header id="topbar-container" class="h-16 glass-panel border-b border-border-dark flex items-center justify-between px-6 shrink-0"></header>
         <div id="workspace-container" class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-            <!-- File Input Area Inicial -->
             <div id="drop-zone" class="w-full max-w-2xl mx-auto mt-20 p-12 border-2 border-dashed border-border-dark rounded-xl flex flex-col items-center justify-center text-center transition-colors hover:border-brand-500 hover:bg-brand-900/10 cursor-pointer">
                 <i data-lucide="upload-cloud" class="w-12 h-12 text-brand-500 mb-4"></i>
                 <h3 class="text-xl font-semibold mb-2">Carregar Dados (JSON, TXT, n8n logs)</h3>
-                <p class="text-gray-400 text-sm mb-6">Todo processamento acontece localmente no seu navegador.</p>
+                <p class="text-gray-400 text-sm mb-6">Processamento local de alta performance em ES2023.</p>
                 <input type="file" id="file-upload" class="hidden" accept=".json,.txt,.csv" multiple>
                 <button onclick="document.getElementById('file-upload').click()" class="bg-brand-600 hover:bg-brand-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
                     Selecionar Arquivos
                 </button>
             </div>
             
-            <!-- Dashboard Content (Oculto inicialmente) -->
             <div id="dashboard-content" class="hidden flex-col gap-6"></div>
         </div>
     </main>
 
-    <!-- Core Modules Script -->
     <script>
-        /**
-         * ==========================================
-         * MÓDULO 1: UTILS
-         * ==========================================
-         */
         const Utils = {
             safeDiv: (num, den) => (den === 0 || isNaN(den) || !den) ? 0 : num / den,
-            
-            formatCurrency: (value, currency = 'BRL') => {
-                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(value || 0);
-            },
-            
-            formatNumber: (value) => {
-                return new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value || 0);
-            },
-            
-            formatPercent: (value) => {
-                return new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 2 }).format(value || 0);
-            },
-            
+            formatCurrency: (value, currency = 'BRL') => new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(value || 0),
+            formatNumber: (value) => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value || 0),
+            formatPercent: (value) => new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 2 }).format(value || 0),
             debounce: (func, wait) => {
                 let timeout;
                 return function executedFunction(...args) {
@@ -96,21 +72,9 @@
                     timeout = setTimeout(later, wait);
                 };
             },
-            
-            generateId: () => crypto.randomUUID(),
-
-            extractNestedValue: (arr, targetKey, valueKey = 'value') => {
-                if (!Array.isArray(arr)) return 0;
-                const found = arr.find(item => item.action_type === targetKey || item.name === targetKey);
-                return found ? parseFloat(found[valueKey] || 0) : 0;
-            }
+            generateId: () => crypto.randomUUID()
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 2: CONFIG
-         * ==========================================
-         */
         const Config = {
             chartDefaults: {
                 responsive: true,
@@ -131,65 +95,29 @@
         Chart.defaults.color = Config.chartDefaults.color;
         Chart.defaults.font.family = Config.chartDefaults.font.family;
 
-        /**
-         * ==========================================
-         * MÓDULO 3: APPSTATE
-         * ==========================================
-         */
         class StateManager {
             constructor() {
                 this.state = {
-                    rawData: [],
-                    normalized: [],
-                    filtered: [],
-                    campaigns: new Map(),
-                    adsets: new Map(),
-                    ads: new Map(),
+                    rawData: [], normalized: [], filtered: [],
                     metrics: { global: {} },
-                    charts: {},
-                    filters: { dateStart: null, dateEnd: null, campaigns: [], search: '' },
-                    settings: { theme: 'dark', businessType: 'unknown' },
-                    insights: [],
-                    selected: null
+                    filters: { dateStart: null, dateEnd: null, search: '' },
+                    settings: { businessType: 'unknown' }
                 };
                 this.listeners = new Set();
             }
-
-            subscribe(listener) {
-                this.listeners.add(listener);
-                return () => this.listeners.delete(listener);
-            }
-
-            notify(changedKeys = []) {
-                this.listeners.forEach(listener => listener(this.state, changedKeys));
-            }
-
-            get(key) {
-                return this.state[key];
-            }
-
-            set(key, value) {
-                this.state[key] = value;
-                this.notify([key]);
-            }
-
+            subscribe(listener) { this.listeners.add(listener); return () => this.listeners.delete(listener); }
+            notify(changedKeys = []) { this.listeners.forEach(listener => listener(this.state, changedKeys)); }
+            get(key) { return this.state[key]; }
+            set(key, value) { this.state[key] = value; this.notify([key]); }
             update(updates) {
                 const keys = Object.keys(updates);
-                keys.forEach(key => {
-                    this.state[key] = updates[key];
-                });
+                keys.forEach(key => this.state[key] = updates[key]);
                 this.notify(keys);
             }
         }
-
         const AppState = new StateManager();
         lucide.createIcons();
 
-        /**
-         * ==========================================
-         * MÓDULO 4: PARSER
-         * ==========================================
-         */
         const Parser = {
             async processFiles(files) {
                 const allData = [];
@@ -198,17 +126,13 @@
                         const text = await this.readFile(file);
                         const parsed = this.parseText(text);
                         
-                        if (Array.isArray(parsed)) {
-                            allData.push(...parsed);
-                        } else if (typeof parsed === 'object' && parsed !== null) {
-                            if (parsed.data && Array.isArray(parsed.data)) {
-                                allData.push(...parsed.data);
-                            } else {
-                                allData.push(parsed);
-                            }
+                        if (Array.isArray(parsed)) allData.push(...parsed);
+                        else if (typeof parsed === 'object' && parsed !== null) {
+                            if (parsed.data && Array.isArray(parsed.data)) allData.push(...parsed.data);
+                            else allData.push(parsed);
                         }
                     } catch (error) {
-                        console.error(`[Parser] Falha contornada no arquivo ${file.name}:`, error);
+                        console.error(`[Parser] Falha no arquivo ${file.name}:`, error);
                     }
                 }
                 return allData;
@@ -227,58 +151,92 @@
                 try {
                     return JSON.parse(text);
                 } catch (e) {
-                    const lines = text.split('\n');
-                    const validData = [];
-                    for (const line of lines) {
-                        if (!line.trim()) continue;
-                        try {
-                            const jsonStart = line.indexOf('{');
-                            const jsonStartArr = line.indexOf('[');
-                            let startIdx = -1;
-                            
-                            if (jsonStart !== -1 && jsonStartArr !== -1) startIdx = Math.min(jsonStart, jsonStartArr);
-                            else if (jsonStart !== -1) startIdx = jsonStart;
-                            else if (jsonStartArr !== -1) startIdx = jsonStartArr;
-                            
-                            if (startIdx > -1) {
-                                validData.push(JSON.parse(line.substring(startIdx)));
-                            }
-                        } catch (err) {}
+                    if (text.includes('campaign_id:') && text.includes('reach:')) {
+                        return this.parseN8nText(text);
                     }
-                    return validData;
+                    return [];
                 }
+            },
+
+            // Máquina de estados para ler o formato de dump textual do n8n
+            parseN8nText(text) {
+                const lines = text.split('\n').map(l => l.trim());
+                const data = [];
+                let currentRow = null;
+                let currentArray = null;
+                let currentArrayItem = null;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!line) continue;
+
+                    if (line.startsWith('campaign_id:')) {
+                        if (currentRow) {
+                            if (currentArrayItem && currentArray && currentRow[currentArray]) currentRow[currentArray].push(currentArrayItem);
+                            data.push(currentRow);
+                        }
+                        currentRow = { actions: [], action_values: [], video_thruplay_watched_actions: [] };
+                        currentArray = null;
+                        currentArrayItem = null;
+                        currentRow['campaign_id'] = line.substring(line.indexOf(':')+1).trim();
+                        continue;
+                    }
+
+                    if (!currentRow) continue;
+
+                    if (line === 'actions' || line === 'action_values' || line === 'video_thruplay_watched_actions') {
+                        if (currentArrayItem && currentArray && currentRow[currentArray]) currentRow[currentArray].push(currentArrayItem);
+                        currentArray = line;
+                        if (!currentRow[currentArray]) currentRow[currentArray] = [];
+                        currentArrayItem = null;
+                        continue;
+                    }
+
+                    if (/^\d+$/.test(line)) {
+                        if (currentArray) {
+                            if (currentArrayItem && Object.keys(currentArrayItem).length > 0) currentRow[currentArray].push(currentArrayItem);
+                            currentArrayItem = {};
+                        }
+                        continue;
+                    }
+
+                    const colonIdx = line.indexOf(':');
+                    if (colonIdx > -1) {
+                        const key = line.substring(0, colonIdx).trim();
+                        const val = line.substring(colonIdx + 1).trim();
+                        if (currentArrayItem && currentArray) currentArrayItem[key] = val;
+                        else currentRow[key] = val;
+                    }
+                }
+
+                if (currentRow) {
+                    if (currentArrayItem && currentArray && currentRow[currentArray]) currentRow[currentArray].push(currentArrayItem);
+                    data.push(currentRow);
+                }
+                return data;
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 5: NORMALIZER
-         * ==========================================
-         */
         const Normalizer = {
             normalize(rawData) {
                 return rawData.map(row => {
                     const parsedActions = this.parseDynamicArray(row.actions || []);
                     const parsedActionValues = this.parseDynamicArray(row.action_values || []);
+                    const parsedThruplays = this.parseDynamicArray(row.video_thruplay_watched_actions || []);
 
                     return {
                         _id: Utils.generateId(),
                         campaign_id: row.campaign_id || 'unknown_campaign',
                         campaign_name: row.campaign_name || 'Campanha Desconhecida',
-                        adset_id: row.adset_id || 'unknown_adset',
-                        adset_name: row.adset_name || 'Conjunto Desconhecido',
-                        ad_id: row.ad_id || 'unknown_ad',
-                        ad_name: row.ad_name || 'Criativo Desconhecido',
                         spend: parseFloat(row.spend || 0),
                         reach: parseInt(row.reach || 0),
                         impressions: parseInt(row.impressions || 0),
                         clicks: parseInt(row.clicks || 0),
-                        inline_link_clicks: parseInt(row.inline_link_clicks || 0),
+                        inline_link_clicks: parseInt(row.inline_link_clicks || row.clicks || 0),
                         actions: parsedActions,
                         action_values: parsedActionValues,
-                        date_start: row.date_start || null,
-                        date_stop: row.date_stop || null,
-                        optimization_goal: row.optimization_goal || 'UNKNOWN'
+                        thruplays: parsedThruplays.video_view || 0,
+                        date_start: row.date_start || null
                     };
                 });
             },
@@ -286,7 +244,6 @@
             parseDynamicArray(arr) {
                 const map = {};
                 if (!Array.isArray(arr)) return map;
-                
                 arr.forEach(item => {
                     if (item.action_type) {
                         const safeKey = item.action_type.replace(/\./g, '_');
@@ -297,54 +254,35 @@
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 6: BUSINESS DETECTOR
-         * ==========================================
-         */
         const BusinessDetector = {
             detect(normalizedData) {
                 let metricsCount = { purchase: 0, lead: 0, message: 0 };
-                let maxLeadValue = 0;
-                
                 normalizedData.forEach(row => {
-                    const purchases = (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
-                    const leads = (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
-                    const messages = (row.actions.messaging_conversation_started_7d || 0) + (row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
+                    const purchases = (row.actions.purchase || row.actions.offsite_conversion_purchase || row.actions.offsite_conversion_fb_pixel_purchase || 0);
+                    const leads = (row.actions.lead || row.actions.onsite_conversion_lead_grouped || row.actions.offsite_conversion_fb_pixel_lead || 0);
+                    const messages = (row.actions.messaging_conversation_started_7d || row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
                     
-                    if (purchases > 0) metricsCount.purchase += purchases;
-                    if (leads > 0) metricsCount.lead += leads;
-                    if (messages > 0) metricsCount.message += messages;
-                    
-                    const currentLeadValue = row.action_values.lead || 0;
-                    if (currentLeadValue > maxLeadValue) maxLeadValue = currentLeadValue;
+                    metricsCount.purchase += purchases;
+                    metricsCount.lead += leads;
+                    metricsCount.message += messages;
                 });
 
                 if (metricsCount.purchase > metricsCount.lead && metricsCount.purchase > metricsCount.message) return 'ecommerce';
-                if (metricsCount.lead > metricsCount.purchase) {
-                    if (maxLeadValue > 50000) return 'real_estate';
-                    return 'lead_generation';
-                }
+                if (metricsCount.lead > metricsCount.purchase && metricsCount.lead > metricsCount.message) return 'lead_generation';
                 if (metricsCount.message > metricsCount.purchase && metricsCount.message > metricsCount.lead) return 'messaging';
-
+                
+                // Fallback para mistos
+                if (metricsCount.lead > 0 || metricsCount.message > 0) return 'lead_generation';
                 return 'brand_awareness';
             }
         };
 
-        /**
-         * ==========================================
-         * INPUT HOOK
-         * ==========================================
-         */
         document.getElementById('file-upload').addEventListener('change', async (event) => {
             const files = event.target.files;
             if (files.length === 0) return;
 
             const dropZone = document.getElementById('drop-zone');
-            dropZone.innerHTML = `
-                <i data-lucide="loader-2" class="w-12 h-12 text-brand-500 mb-4 animate-spin"></i>
-                <h3 class="text-xl font-semibold mb-2">Processando arquivo(s)...</h3>
-            `;
+            dropZone.innerHTML = `<i data-lucide="loader-2" class="w-12 h-12 text-brand-500 mb-4 animate-spin"></i><h3 class="text-xl font-semibold">Processando arquivo(s)...</h3>`;
             lucide.createIcons();
 
             requestAnimationFrame(async () => {
@@ -361,50 +299,41 @@
             });
         });
 
-        /**
-         * ==========================================
-         * MÓDULO 7: METRICS ENGINE
-         * ==========================================
-         */
         const MetricsEngine = {
             calculate(data) {
                 let m = {
                     spend: 0, impressions: 0, clicks: 0, reach: 0, inline_link_clicks: 0,
-                    purchases: 0, revenue: 0, leads: 0, messages: 0, video_views: 0
+                    purchases: 0, revenue: 0, leads: 0, messages: 0, thruplays: 0
                 };
 
                 data.forEach(row => {
                     m.spend += row.spend;
                     m.impressions += row.impressions;
                     m.clicks += row.clicks;
-                    m.reach += row.reach;
+                    m.reach += row.reach; // Alcance Acumulado
                     m.inline_link_clicks += row.inline_link_clicks;
+                    m.thruplays += row.thruplays;
 
-                    m.purchases += (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
-                    m.revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
-                    m.leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
-                    m.messages += (row.actions.messaging_conversation_started_7d || 0) + (row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
+                    // Lógica blindada contra Dupla Contagem usando (||) precedência lógica
+                    m.purchases += (row.actions.purchase || row.actions.offsite_conversion_purchase || row.actions.offsite_conversion_fb_pixel_purchase || 0);
+                    m.revenue += (row.action_values.purchase || row.action_values.offsite_conversion_purchase || row.action_values.offsite_conversion_fb_pixel_purchase || 0);
+                    
+                    m.leads += (row.actions.lead || row.actions.onsite_conversion_lead_grouped || row.actions.offsite_conversion_fb_pixel_lead || 0);
+                    m.messages += (row.actions.onsite_conversion_messaging_conversation_started_7d || row.actions.messaging_conversation_started_7d || 0);
                 });
 
                 const cpm = Utils.safeDiv(m.spend, m.impressions) * 1000;
                 const ctr = Utils.safeDiv(m.inline_link_clicks || m.clicks, m.impressions);
                 const cpc = Utils.safeDiv(m.spend, m.inline_link_clicks || m.clicks);
-                const frequency = Utils.safeDiv(m.impressions, m.reach);
                 const roas = Utils.safeDiv(m.revenue, m.spend);
                 const cpa = Utils.safeDiv(m.spend, m.purchases);
-                const ticket = Utils.safeDiv(m.revenue, m.purchases);
                 const cpl = Utils.safeDiv(m.spend, m.leads);
                 const cpmsg = Utils.safeDiv(m.spend, m.messages);
 
-                return { ...m, cpm, ctr, cpc, frequency, roas, cpa, ticket, cpl, cpmsg };
+                return { ...m, cpm, ctr, cpc, roas, cpa, cpl, cpmsg };
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 8: KPIs RENDERER
-         * ==========================================
-         */
         const KPIs = {
             render(metrics, businessType) {
                 const container = document.getElementById('kpi-container');
@@ -412,37 +341,28 @@
 
                 let config = [
                     { label: 'Investimento Total', value: Utils.formatCurrency(metrics.spend), icon: 'dollar-sign', color: 'text-gray-200' },
-                    { label: 'Custo por Clique (CPC)', value: Utils.formatCurrency(metrics.cpc), icon: 'mouse-pointer-2', color: 'text-gray-400' },
-                    { label: 'CPM', value: Utils.formatCurrency(metrics.cpm), icon: 'eye', color: 'text-gray-400' },
-                    { label: 'CTR', value: Utils.formatPercent(metrics.ctr), icon: 'bar-chart-2', color: 'text-gray-400' }
+                    { label: 'Alcance Acumulado', value: Utils.formatNumber(metrics.reach), icon: 'radio-tower', color: 'text-amber-400' },
+                    { label: `Cliques Link (CTR: ${Utils.formatPercent(metrics.ctr)})`, value: Utils.formatNumber(metrics.inline_link_clicks), icon: 'mouse-pointer-2', color: 'text-blue-400' },
+                    { label: 'ThruPlays', value: Utils.formatNumber(metrics.thruplays), icon: 'play', color: 'text-purple-400' }
                 ];
 
                 if (businessType === 'ecommerce') {
                     config.unshift(
-                        { label: 'Receita Gerada', value: Utils.formatCurrency(metrics.revenue), icon: 'trending-up', color: 'text-brand-500' },
-                        { label: 'ROAS', value: Utils.formatNumber(metrics.roas) + 'x', icon: 'zap', color: 'text-yellow-400' },
-                        { label: 'Total de Compras', value: Utils.formatNumber(metrics.purchases), icon: 'shopping-cart', color: 'text-brand-500' },
-                        { label: 'CPA', value: Utils.formatCurrency(metrics.cpa), icon: 'target', color: 'text-red-400' }
+                        { label: `Faturamento (ROAS: ${Utils.formatNumber(metrics.roas)}x)`, value: Utils.formatCurrency(metrics.revenue), icon: 'trending-up', color: 'text-brand-500' },
+                        { label: `Compras (CPA: ${Utils.formatCurrency(metrics.cpa)})`, value: Utils.formatNumber(metrics.purchases), icon: 'shopping-cart', color: 'text-brand-500' }
                     );
-                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
+                } else {
                     config.unshift(
-                        { label: 'Leads Capturados', value: Utils.formatNumber(metrics.leads), icon: 'users', color: 'text-brand-500' },
-                        { label: 'Custo por Lead (CPL)', value: Utils.formatCurrency(metrics.cpl), icon: 'magnet', color: 'text-yellow-400' }
-                    );
-                } else if (businessType === 'messaging') {
-                    config.unshift(
-                        { label: 'Conversas Iniciadas', value: Utils.formatNumber(metrics.messages), icon: 'message-circle', color: 'text-brand-500' },
-                        { label: 'Custo por Mensagem', value: Utils.formatCurrency(metrics.cpmsg), icon: 'smartphone', color: 'text-yellow-400' }
+                        { label: `Leads Form (CPL: ${Utils.formatCurrency(metrics.cpl)})`, value: Utils.formatNumber(metrics.leads), icon: 'users', color: 'text-brand-500' },
+                        { label: `Conversas Msg (CPMsg: ${Utils.formatCurrency(metrics.cpmsg)})`, value: Utils.formatNumber(metrics.messages), icon: 'message-circle', color: 'text-brand-500' }
                     );
                 }
 
                 container.innerHTML = config.map(card => `
-                    <div class="glass-panel p-6 rounded-xl flex flex-col justify-between shadow-card hover:border-brand-500/50 transition-all duration-300">
-                        <div class="flex justify-between items-start mb-4">
+                    <div class="glass-panel p-6 rounded-xl flex flex-col justify-between shadow-card hover:border-brand-500/50 transition-all">
+                        <div class="flex justify-between items-start mb-2">
                             <span class="text-sm font-medium text-gray-400">${card.label}</span>
-                            <div class="p-2 bg-surface-800 rounded-lg border border-border-dark">
-                                <i data-lucide="${card.icon}" class="w-5 h-5 ${card.color}"></i>
-                            </div>
+                            <i data-lucide="${card.icon}" class="w-5 h-5 ${card.color}"></i>
                         </div>
                         <h4 class="text-3xl font-bold text-white tracking-tight">${card.value}</h4>
                     </div>
@@ -451,14 +371,8 @@
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 9: CHARTS ENGINE
-         * ==========================================
-         */
         const ChartsEngine = {
             instances: {},
-
             render(data, businessType) {
                 this.ensureContainers();
                 const timelineData = this.groupDataByDate(data);
@@ -466,46 +380,36 @@
                 this.renderTimelineChart(timelineData, businessType);
                 this.renderCompositionChart(campaignData);
             },
-
             ensureContainers() {
                 const dashboardContent = document.getElementById('dashboard-content');
                 if (!document.getElementById('charts-container')) {
-                    const chartsHTML = `
+                    dashboardContent.insertAdjacentHTML('beforeend', `
                         <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full mt-2">
                             <div class="glass-panel p-6 rounded-xl shadow-card lg:col-span-2 h-96 flex flex-col">
-                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Desempenho no Tempo</h3>
+                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Evolução Diária de Desempenho</h3>
                                 <div class="relative flex-1 w-full h-full"><canvas id="chart-timeline"></canvas></div>
                             </div>
                             <div class="glass-panel p-6 rounded-xl shadow-card lg:col-span-1 h-96 flex flex-col">
-                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Top Campanhas (Gasto)</h3>
+                                <h3 class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-wider">Divisão de Gasto por Campanha</h3>
                                 <div class="relative flex-1 w-full h-full"><canvas id="chart-composition"></canvas></div>
                             </div>
                         </div>
-                    `;
-                    dashboardContent.insertAdjacentHTML('beforeend', chartsHTML);
+                    `);
                 }
             },
-
-            destroyChart(id) {
-                if (this.instances[id]) this.instances[id].destroy();
-            },
-
+            destroyChart(id) { if (this.instances[id]) this.instances[id].destroy(); },
             groupDataByDate(data) {
                 const grouped = {};
                 data.forEach(row => {
                     if (!row.date_start) return;
-                    const date = row.date_start;
-                    if (!grouped[date]) grouped[date] = { spend: 0, revenue: 0, leads: 0, messages: 0 };
-                    grouped[date].spend += row.spend;
-                    grouped[date].revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
-                    grouped[date].leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
-                    grouped[date].messages += (row.actions.messaging_conversation_started_7d || 0);
+                    if (!grouped[row.date_start]) grouped[row.date_start] = { spend: 0, revenue: 0, leads: 0, messages: 0 };
+                    grouped[row.date_start].spend += row.spend;
+                    grouped[row.date_start].revenue += (row.action_values.purchase || row.action_values.offsite_conversion_purchase || row.action_values.offsite_conversion_fb_pixel_purchase || 0);
+                    grouped[row.date_start].leads += (row.actions.lead || row.actions.onsite_conversion_lead_grouped || row.actions.offsite_conversion_fb_pixel_lead || 0);
+                    grouped[row.date_start].messages += (row.actions.messaging_conversation_started_7d || row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
                 });
-                return Object.entries(grouped)
-                    .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
-                    .reduce((obj, [key, val]) => { obj[key] = val; return obj; }, {});
+                return Object.entries(grouped).sort(([a], [b]) => new Date(a) - new Date(b)).reduce((obj, [k, v]) => { obj[k] = v; return obj; }, {});
             },
-
             groupDataByCampaign(data) {
                 const grouped = {};
                 data.forEach(row => {
@@ -519,11 +423,9 @@
                 if (others > 0) top5.push(['Outras', others]);
                 return top5;
             },
-
             renderTimelineChart(timelineData, businessType) {
                 this.destroyChart('chart-timeline');
                 const ctx = document.getElementById('chart-timeline').getContext('2d');
-                
                 const labels = Object.keys(timelineData);
                 const spendData = labels.map(l => timelineData[l].spend);
                 
@@ -531,386 +433,154 @@
                 if (businessType === 'ecommerce') {
                     secondaryData = labels.map(l => timelineData[l].revenue);
                     secondaryLabel = 'Receita (R$)'; secondaryColor = 'rgba(20, 184, 166, 1)';
-                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
-                    secondaryData = labels.map(l => timelineData[l].leads);
-                    secondaryLabel = 'Leads'; secondaryColor = 'rgba(250, 204, 21, 1)';
                 } else {
-                    secondaryData = labels.map(l => timelineData[l].messages);
-                    secondaryLabel = 'Mensagens'; secondaryColor = 'rgba(56, 189, 248, 1)';
+                    secondaryData = labels.map(l => timelineData[l].leads + timelineData[l].messages);
+                    secondaryLabel = 'Conversões (Leads + Msg)'; secondaryColor = 'rgba(56, 189, 248, 1)';
                 }
 
                 const gradientSpend = ctx.createLinearGradient(0, 0, 0, 400);
-                gradientSpend.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
-                gradientSpend.addColorStop(1, 'rgba(239, 68, 68, 0)');
+                gradientSpend.addColorStop(0, 'rgba(20, 184, 166, 0.2)');
+                gradientSpend.addColorStop(1, 'rgba(20, 184, 166, 0)');
 
                 this.instances['chart-timeline'] = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [
-                            { label: secondaryLabel, data: secondaryData, borderColor: secondaryColor, backgroundColor: secondaryColor, tension: 0.4, borderWidth: 2, yAxisID: 'y' },
-                            { label: 'Investimento (R$)', data: spendData, borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: gradientSpend, fill: true, tension: 0.4, borderWidth: 2, yAxisID: 'y1' }
+                            { type: 'bar', label: secondaryLabel, data: secondaryData, backgroundColor: secondaryColor, borderRadius: 4, yAxisID: 'y' },
+                            { type: 'line', label: 'Investimento (R$)', data: spendData, borderColor: '#14b8a6', backgroundColor: gradientSpend, fill: true, tension: 0.4, borderWidth: 2, yAxisID: 'y1' }
                         ]
                     },
                     options: {
                         ...Config.chartDefaults,
                         interaction: { mode: 'index', intersect: false },
-                        scales: { x: Config.chartDefaults.scales.x, y: { type: 'linear', position: 'left' }, y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } } }
+                        scales: { x: Config.chartDefaults.scales.x, y: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }, y1: { type: 'linear', position: 'left' } }
                     }
                 });
             },
-
             renderCompositionChart(campaignData) {
                 this.destroyChart('chart-composition');
                 const ctx = document.getElementById('chart-composition').getContext('2d');
-                
                 this.instances['chart-composition'] = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: campaignData.map(i => i[0]),
-                        datasets: [{
-                            data: campaignData.map(i => i[1]),
-                            backgroundColor: ['#14b8a6', '#0ea5e9', '#8b5cf6', '#f59e0b', '#f43f5e', '#3f3f46'],
-                            borderWidth: 0, hoverOffset: 4
-                        }]
+                        datasets: [{ data: campaignData.map(i => i[1]), backgroundColor: ['#14b8a6', '#0ea5e9', '#8b5cf6', '#f59e0b', '#f43f5e', '#3f3f46'], borderWidth: 0, hoverOffset: 4 }]
                     },
-                    options: {
-                        ...Config.chartDefaults, cutout: '70%',
-                        plugins: { legend: { position: 'bottom', labels: { padding: 20, color: '#a1a1aa', usePointStyle: true } } }
-                    }
+                    options: { ...Config.chartDefaults, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, color: '#a1a1aa', usePointStyle: true } } } }
                 });
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 10: TABLE ENGINE
-         * ==========================================
-         */
         const TableEngine = {
             sortConfig: { key: 'spend', direction: 'desc' },
             currentData: [], currentBusinessType: 'unknown',
-
             render(data, businessType) {
                 this.currentBusinessType = businessType;
                 this.ensureContainer();
                 this.currentData = this.aggregateByCampaign(data);
                 this.drawTable();
             },
-
             ensureContainer() {
-                const dashboardContent = document.getElementById('dashboard-content');
                 if (!document.getElementById('table-container')) {
-                    const tableHTML = `
+                    document.getElementById('dashboard-content').insertAdjacentHTML('beforeend', `
                         <div id="table-container" class="glass-panel rounded-xl shadow-card w-full flex flex-col mt-2 overflow-hidden border border-border-dark">
-                            <div class="p-6 border-b border-border-dark flex justify-between items-center bg-surface-800/50">
-                                <div><h3 class="text-lg font-semibold text-white">Desempenho por Campanha</h3></div>
-                            </div>
-                            <div class="overflow-x-auto scrollbar-hide">
-                                <table class="w-full text-left border-collapse">
-                                    <thead id="table-head" class="bg-surface-900/80 text-xs uppercase text-gray-400 border-b border-border-dark"></thead>
-                                    <tbody id="table-body" class="text-sm text-gray-300 divide-y divide-border-dark"></tbody>
-                                </table>
-                            </div>
+                            <div class="p-6 border-b border-border-dark"><h3 class="text-lg font-semibold text-white">Desempenho por Campanha</h3></div>
+                            <div class="overflow-x-auto scrollbar-hide"><table class="w-full text-left border-collapse"><thead id="table-head" class="bg-surface-900/80 text-xs uppercase text-gray-400 border-b border-border-dark"></thead><tbody id="table-body" class="text-sm text-gray-300 divide-y divide-border-dark"></tbody></table></div>
                         </div>
-                    `;
-                    dashboardContent.insertAdjacentHTML('beforeend', tableHTML);
+                    `);
                 }
             },
-
             aggregateByCampaign(data) {
                 const map = new Map();
                 data.forEach(row => {
                     const id = row.campaign_id;
-                    if (!map.has(id)) {
-                        map.set(id, {
-                            id: id, name: row.campaign_name, spend: 0, impressions: 0, clicks: 0, reach: 0, link_clicks: 0,
-                            purchases: 0, revenue: 0, leads: 0, messages: 0
-                        });
-                    }
+                    if (!map.has(id)) map.set(id, { id: id, name: row.campaign_name, spend: 0, impressions: 0, clicks: 0, purchases: 0, revenue: 0, leads: 0, messages: 0 });
                     const c = map.get(id);
-                    c.spend += row.spend; c.impressions += row.impressions; c.clicks += row.clicks;
-                    c.reach += row.reach; c.link_clicks += row.inline_link_clicks;
-                    c.purchases += (row.actions.purchase || 0) + (row.actions.offsite_conversion_purchase || 0);
-                    c.revenue += (row.action_values.purchase || 0) + (row.action_values.offsite_conversion_purchase || 0);
-                    c.leads += (row.actions.lead || 0) + (row.actions.onsite_conversion_lead_grouped || 0);
-                    c.messages += (row.actions.messaging_conversation_started_7d || 0);
+                    c.spend += row.spend; c.impressions += row.impressions; c.clicks += row.inline_link_clicks || row.clicks;
+                    c.purchases += (row.actions.purchase || row.actions.offsite_conversion_purchase || row.actions.offsite_conversion_fb_pixel_purchase || 0);
+                    c.revenue += (row.action_values.purchase || row.action_values.offsite_conversion_purchase || row.action_values.offsite_conversion_fb_pixel_purchase || 0);
+                    c.leads += (row.actions.lead || row.actions.onsite_conversion_lead_grouped || row.actions.offsite_conversion_fb_pixel_lead || 0);
+                    c.messages += (row.actions.messaging_conversation_started_7d || row.actions.onsite_conversion_messaging_conversation_started_7d || 0);
                 });
-
                 return Array.from(map.values()).map(c => {
-                    c.cpc = Utils.safeDiv(c.spend, c.link_clicks || c.clicks);
-                    c.cpm = Utils.safeDiv(c.spend, c.impressions) * 1000;
-                    c.ctr = Utils.safeDiv(c.link_clicks || c.clicks, c.impressions);
-                    c.roas = Utils.safeDiv(c.revenue, c.spend);
-                    c.cpa = Utils.safeDiv(c.spend, c.purchases);
-                    c.cpl = Utils.safeDiv(c.spend, c.leads);
-                    c.cpmsg = Utils.safeDiv(c.spend, c.messages);
-                    return c;
+                    c.cpc = Utils.safeDiv(c.spend, c.clicks); c.roas = Utils.safeDiv(c.revenue, c.spend); c.cpa = Utils.safeDiv(c.spend, c.purchases); c.cpl = Utils.safeDiv(c.spend, c.leads); return c;
                 });
             },
-
             getColumns() {
-                const cols = [
-                    { key: 'name', label: 'Campanha', format: 'text' },
-                    { key: 'spend', label: 'Investimento', format: 'currency' },
-                    { key: 'cpc', label: 'CPC', format: 'currency' },
-                    { key: 'ctr', label: 'CTR', format: 'percent' }
-                ];
-
-                const biz = this.currentBusinessType;
-                if (biz === 'ecommerce') {
-                    cols.push({ key: 'revenue', label: 'Receita', format: 'currency' }, { key: 'roas', label: 'ROAS', format: 'number', suffix: 'x' }, { key: 'purchases', label: 'Compras', format: 'number' }, { key: 'cpa', label: 'CPA', format: 'currency' });
-                } else if (biz === 'lead_generation' || biz === 'real_estate') {
-                    cols.push({ key: 'leads', label: 'Leads', format: 'number' }, { key: 'cpl', label: 'CPL', format: 'currency' });
-                } else if (biz === 'messaging') {
-                    cols.push({ key: 'messages', label: 'Mensagens', format: 'number' }, { key: 'cpmsg', label: 'Custo/Msg', format: 'currency' });
-                }
+                const cols = [{ key: 'name', label: 'Campanha', format: 'text' }, { key: 'spend', label: 'Investimento', format: 'currency' }, { key: 'cpc', label: 'CPC', format: 'currency' }];
+                if (this.currentBusinessType === 'ecommerce') cols.push({ key: 'revenue', label: 'Receita', format: 'currency' }, { key: 'roas', label: 'ROAS', format: 'number', suffix: 'x' }, { key: 'purchases', label: 'Compras', format: 'number' }, { key: 'cpa', label: 'CPA', format: 'currency' });
+                else cols.push({ key: 'leads', label: 'Leads', format: 'number' }, { key: 'cpl', label: 'CPL', format: 'currency' }, { key: 'messages', label: 'Msg', format: 'number' });
                 return cols;
             },
-
             handleSort(key) {
                 if (this.sortConfig.key === key) this.sortConfig.direction = this.sortConfig.direction === 'asc' ? 'desc' : 'asc';
                 else { this.sortConfig.key = key; this.sortConfig.direction = 'desc'; }
                 this.drawTable();
             },
-
             drawTable() {
                 const columns = this.getColumns();
                 const { key, direction } = this.sortConfig;
-                
                 const sortedData = [...this.currentData].sort((a, b) => {
                     let valA = a[key], valB = b[key];
-                    if (typeof valA === 'string') valA = valA.toLowerCase();
-                    if (typeof valB === 'string') valB = valB.toLowerCase();
-                    if (valA < valB) return direction === 'asc' ? -1 : 1;
-                    if (valA > valB) return direction === 'asc' ? 1 : -1;
-                    return 0;
+                    if (typeof valA === 'string') valA = valA.toLowerCase(); if (typeof valB === 'string') valB = valB.toLowerCase();
+                    if (valA < valB) return direction === 'asc' ? -1 : 1; if (valA > valB) return direction === 'asc' ? 1 : -1; return 0;
                 });
-
-                document.getElementById('table-head').innerHTML = `<tr>
-                    ${columns.map(col => `
-                        <th class="px-6 py-4 font-semibold cursor-pointer hover:text-brand-500 transition-colors select-none whitespace-nowrap group" onclick="TableEngine.handleSort('${col.key}')">
-                            <div class="flex items-center gap-2">${col.label} ${this.sortConfig.key === col.key ? `<i data-lucide="chevron-${this.sortConfig.direction === 'asc' ? 'up' : 'down'}" class="w-4 h-4 text-brand-500"></i>` : `<i data-lucide="chevrons-up-down" class="w-4 h-4 text-gray-600"></i>`}</div>
-                        </th>
-                    `).join('')}
-                </tr>`;
-
-                document.getElementById('table-body').innerHTML = sortedData.map(row => `
-                    <tr class="hover:bg-surface-800/80 transition-colors cursor-default">
-                        ${columns.map(col => {
-                            let value = row[col.key];
-                            if (col.format === 'currency') value = Utils.formatCurrency(value);
-                            else if (col.format === 'percent') value = Utils.formatPercent(value);
-                            else if (col.format === 'number') value = Utils.formatNumber(value) + (col.suffix || '');
-                            
-                            return `<td class="px-6 py-4 whitespace-nowrap ${col.key === 'name' ? 'text-white font-medium max-w-[300px] truncate' : 'text-gray-400'}">${value}</td>`;
-                        }).join('')}
-                    </tr>
-                `).join('');
-
-                lucide.createIcons();
+                document.getElementById('table-head').innerHTML = `<tr>${columns.map(col => `<th class="px-6 py-4 font-semibold cursor-pointer hover:text-brand-500 whitespace-nowrap" onclick="TableEngine.handleSort('${col.key}')">${col.label}</th>`).join('')}</tr>`;
+                document.getElementById('table-body').innerHTML = sortedData.map(row => `<tr class="hover:bg-surface-800/80">${columns.map(col => {
+                    let value = row[col.key];
+                    if (col.format === 'currency') value = Utils.formatCurrency(value); else if (col.format === 'number') value = Utils.formatNumber(value) + (col.suffix || '');
+                    return `<td class="px-6 py-4 whitespace-nowrap ${col.key === 'name' ? 'text-white max-w-[300px] truncate' : 'text-gray-400'}">${value}</td>`;
+                }).join('')}</tr>`).join('');
             }
         };
 
-        /**
-         * ==========================================
-         * MÓDULO 11: INSIGHTS ENGINE
-         * ==========================================
-         */
-        const InsightsEngine = {
-            render(data, globalMetrics, businessType) {
-                this.ensureContainer();
-                const insights = this.analyze(data, globalMetrics, businessType);
-                this.drawInsights(insights);
-            },
-
-            ensureContainer() {
-                if (!document.getElementById('insights-container')) {
-                    const insightsHTML = `
-                        <div id="insights-container" class="glass-panel p-6 rounded-xl w-full mt-2 border border-brand-500/30 bg-brand-900/10">
-                            <div class="flex items-center gap-3 mb-5">
-                                <div class="p-2 bg-brand-500/20 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5 text-brand-400 animate-pulse"></i></div>
-                                <div><h3 class="text-lg font-semibold text-white">Smart Insights</h3></div>
-                            </div>
-                            <div id="insights-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                        </div>
-                    `;
-                    const tableContainer = document.getElementById('table-container');
-                    if (tableContainer) tableContainer.insertAdjacentHTML('beforebegin', insightsHTML);
-                    else document.getElementById('dashboard-content').insertAdjacentHTML('beforeend', insightsHTML);
-                }
-            },
-
-            analyze(data, globalMetrics, businessType) {
-                const insights = [];
-                const campaigns = TableEngine.aggregateByCampaign(data);
-                if (campaigns.length === 0 || globalMetrics.spend === 0) return insights;
-
-                const topSpender = [...campaigns].sort((a, b) => b.spend - a.spend)[0];
-                const spendPercent = (topSpender.spend / globalMetrics.spend) * 100;
-                
-                if (spendPercent > 40 && campaigns.length > 1) {
-                    insights.push({ icon: 'alert-triangle', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', title: 'Alerta de Concentração', text: `A campanha <b>"${topSpender.name}"</b> consome <b>${spendPercent.toFixed(1)}%</b> do orçamento.` });
-                }
-
-                if (businessType === 'ecommerce') {
-                    const sortedByRoas = campaigns.filter(c => c.spend > 0 && c.purchases > 0).sort((a, b) => b.roas - a.roas);
-                    if (sortedByRoas.length > 0) {
-                        if (sortedByRoas[0].roas > globalMetrics.roas * 1.3) insights.push({ icon: 'trending-up', color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', title: 'Oportunidade de Escala', text: `<b>"${sortedByRoas[0].name}"</b> tem ROAS de <b>${sortedByRoas[0].roas.toFixed(2)}x</b>.` });
-                    }
-                } else if (businessType === 'lead_generation' || businessType === 'real_estate') {
-                    const sortedByCpl = campaigns.filter(c => c.leads > 0).sort((a, b) => a.cpl - b.cpl);
-                    if (sortedByCpl.length > 0) {
-                        if (sortedByCpl[0].cpl < globalMetrics.cpl * 0.75) insights.push({ icon: 'award', color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', title: 'Captação Eficiente', text: `<b>"${sortedByCpl[0].name}"</b> gera leads a <b>${Utils.formatCurrency(sortedByCpl[0].cpl)}</b>.` });
-                    }
-                }
-
-                return insights.slice(0, 3);
-            },
-
-            drawInsights(insights) {
-                const list = document.getElementById('insights-list');
-                if (insights.length === 0) {
-                    list.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500">Nenhuma anomalia crítica detectada.</div>`;
-                    return;
-                }
-                list.innerHTML = insights.map(insight => `
-                    <div class="${insight.bg} border ${insight.border} p-5 rounded-xl flex gap-4 items-start">
-                        <div class="p-2.5 rounded-full bg-surface-900 border ${insight.border} shadow-sm shrink-0 flex items-center justify-center"><i data-lucide="${insight.icon}" class="w-5 h-5 ${insight.color}"></i></div>
-                        <div class="flex-1"><h4 class="text-white font-semibold text-sm mb-1">${insight.title}</h4><p class="text-gray-300 text-xs">${insight.text}</p></div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-        };
-
-        /**
-         * ==========================================
-         * MÓDULO 12: FILTERS ENGINE
-         * ==========================================
-         */
         const FiltersEngine = {
             init() {
-                this.renderSidebar();
-                this.attachListeners();
-            },
-
-            renderSidebar() {
                 document.getElementById('sidebar-container').innerHTML = `
                     <div class="p-6 border-b border-border-dark flex items-center gap-3 shrink-0 bg-surface-900/50">
-                        <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-                            <i data-lucide="bar-chart-3" class="text-white w-5 h-5"></i>
-                        </div>
+                        <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center"><i data-lucide="bar-chart-3" class="text-white w-5 h-5"></i></div>
                         <h1 class="text-xl font-bold text-white tracking-tight">MetaAds<span class="text-brand-500 font-light">BI</span></h1>
                     </div>
-                    
                     <div class="p-6 flex flex-col gap-8 flex-1 overflow-y-auto">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pesquisar</label>
-                            <div class="relative">
-                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
-                                <input type="text" id="filter-search" placeholder="Nome da campanha..." class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition-colors disabled:opacity-50" disabled>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Período de Análise</label>
-                            <div class="space-y-4">
-                                <div>
-                                    <span class="text-xs text-gray-500 block mb-1.5 font-medium">Data Inicial</span>
-                                    <div class="relative">
-                                        <i data-lucide="calendar" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
-                                        <input type="date" id="filter-date-start" class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 transition-colors [color-scheme:dark] disabled:opacity-50" disabled>
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-gray-500 block mb-1.5 font-medium">Data Final</span>
-                                    <div class="relative">
-                                        <i data-lucide="calendar" class="w-4 h-4 absolute left-3 top-2.5 text-gray-500"></i>
-                                        <input type="date" id="filter-date-end" class="w-full bg-surface-800 border border-border-dark rounded-lg pl-9 pr-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 transition-colors [color-scheme:dark] disabled:opacity-50" disabled>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4 border-t border-border-dark mt-auto">
-                            <button id="filter-clear" disabled class="w-full py-2 bg-surface-800 hover:bg-surface-700 border border-border-dark hover:border-gray-500 rounded-lg text-sm font-medium text-gray-300 flex items-center justify-center gap-2 disabled:opacity-50">
-                                <i data-lucide="filter-x" class="w-4 h-4"></i> Limpar Filtros
-                            </button>
+                        <div><label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pesquisar</label><input type="text" id="filter-search" placeholder="Campanha..." class="w-full bg-surface-800 border border-border-dark rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500" disabled></div>
+                        <div class="space-y-4">
+                            <div><span class="text-xs text-gray-500 block mb-1">Data Inicial</span><input type="date" id="filter-date-start" class="w-full bg-surface-800 border border-border-dark rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 [color-scheme:dark]" disabled></div>
+                            <div><span class="text-xs text-gray-500 block mb-1">Data Final</span><input type="date" id="filter-date-end" class="w-full bg-surface-800 border border-border-dark rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-brand-500 [color-scheme:dark]" disabled></div>
                         </div>
                     </div>
                 `;
                 lucide.createIcons();
+                const apply = () => AppState.update({ filters: { search: document.getElementById('filter-search').value.toLowerCase(), dateStart: document.getElementById('filter-date-start').value, dateEnd: document.getElementById('filter-date-end').value } });
+                document.getElementById('filter-search').addEventListener('input', Utils.debounce(apply, 300));
+                document.getElementById('filter-date-start').addEventListener('change', apply);
+                document.getElementById('filter-date-end').addEventListener('change', apply);
             },
-
-            attachListeners() {
-                const handleFilterChange = () => {
-                    const search = document.getElementById('filter-search').value.toLowerCase();
-                    const dateStart = document.getElementById('filter-date-start').value;
-                    const dateEnd = document.getElementById('filter-date-end').value;
-                    AppState.update({ filters: { search, dateStart, dateEnd } });
-                };
-
-                document.getElementById('filter-search').addEventListener('input', Utils.debounce(handleFilterChange, 300));
-                document.getElementById('filter-date-start').addEventListener('change', handleFilterChange);
-                document.getElementById('filter-date-end').addEventListener('change', handleFilterChange);
-                document.getElementById('filter-clear').addEventListener('click', () => {
-                    document.getElementById('filter-search').value = '';
-                    document.getElementById('filter-date-start').value = '';
-                    document.getElementById('filter-date-end').value = '';
-                    handleFilterChange();
-                });
-            },
-
-            enableControls() {
-                document.getElementById('filter-search').removeAttribute('disabled');
-                document.getElementById('filter-date-start').removeAttribute('disabled');
-                document.getElementById('filter-date-end').removeAttribute('disabled');
-                document.getElementById('filter-clear').removeAttribute('disabled');
-            },
-
-            applyFilters(normalizedData, filters) {
-                if (!filters.search && !filters.dateStart && !filters.dateEnd) return normalizedData;
-
-                return normalizedData.filter(row => {
-                    if (filters.search && !(row.campaign_name || '').toLowerCase().includes(filters.search)) return false;
-                    if (filters.dateStart && row.date_start && row.date_start < filters.dateStart) return false;
-                    if (filters.dateEnd && row.date_start && row.date_start > filters.dateEnd) return false;
+            enable() { ['filter-search', 'filter-date-start', 'filter-date-end'].forEach(id => document.getElementById(id).removeAttribute('disabled')); },
+            applyFilters(data, f) {
+                if (!f.search && !f.dateStart && !f.dateEnd) return data;
+                return data.filter(row => {
+                    if (f.search && !(row.campaign_name || '').toLowerCase().includes(f.search)) return false;
+                    if (f.dateStart && row.date_start && row.date_start < f.dateStart) return false;
+                    if (f.dateEnd && row.date_start && row.date_start > f.dateEnd) return false;
                     return true;
                 });
             }
         };
 
-        FiltersEngine.init();
-
-        /**
-         * ==========================================
-         * MÓDULO 13: TOPBAR ENGINE
-         * ==========================================
-         */
         const TopbarEngine = {
             render(count) {
-                const header = document.getElementById('topbar-container');
-                header.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 text-gray-400"></i>
-                        <h2 class="text-sm font-medium text-gray-300">Workspace / <span class="text-white font-semibold">${count} registros processados</span></h2>
-                    </div>
-                `;
+                document.getElementById('topbar-container').innerHTML = `<div class="flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-5 h-5 text-gray-400"></i><h2 class="text-sm font-medium text-gray-300">Workspace / <span class="text-white font-semibold">${count} registros processados</span></h2></div>`;
                 lucide.createIcons();
             }
         };
 
-        /**
-         * ==========================================
-         * CONEXÃO REATIVA FINAL (Observer Unificado e Limpo)
-         * ==========================================
-         */
+        FiltersEngine.init();
+
         AppState.subscribe((state, changedKeys) => {
             if (changedKeys.includes('normalized') || changedKeys.includes('filters')) {
-                const newFilteredData = FiltersEngine.applyFilters(state.normalized, state.filters);
-                state.filtered = newFilteredData; 
-                if (state.normalized.length > 0) FiltersEngine.enableControls();
+                state.filtered = FiltersEngine.applyFilters(state.normalized, state.filters);
+                if (state.normalized.length > 0) FiltersEngine.enable();
             }
 
             if (changedKeys.includes('filtered') || changedKeys.includes('normalized') || changedKeys.includes('filters')) {
@@ -921,20 +591,16 @@
                 state.metrics.global = globalMetrics;
 
                 document.getElementById('drop-zone').classList.add('hidden');
-                const dashboardContent = document.getElementById('dashboard-content');
-                dashboardContent.classList.remove('hidden');
-                dashboardContent.classList.add('flex');
+                const content = document.getElementById('dashboard-content');
+                content.classList.remove('hidden'); content.classList.add('flex');
 
-                if (!document.getElementById('kpi-container')) {
-                    dashboardContent.insertAdjacentHTML('afterbegin', '<div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full"></div>');
-                }
+                if (!document.getElementById('kpi-container')) content.insertAdjacentHTML('afterbegin', '<div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 w-full"></div>');
 
                 TopbarEngine.render(dataToProcess.length);
                 KPIs.render(globalMetrics, state.settings.businessType);
 
                 requestAnimationFrame(() => {
                     ChartsEngine.render(dataToProcess, state.settings.businessType);
-                    InsightsEngine.render(dataToProcess, globalMetrics, state.settings.businessType);
                     TableEngine.render(dataToProcess, state.settings.businessType);
                 });
             }
